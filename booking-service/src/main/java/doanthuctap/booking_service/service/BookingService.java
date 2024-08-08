@@ -19,5 +19,7 @@ public interface BookingService {
 
     Booking updateBookingStatus (Long id, String status) throws  Exception;
 
+    List <Booking> findApprovedBookingsWithoutContract();
+
     String generateConfirmationCode();
 }

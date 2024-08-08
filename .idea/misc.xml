@@ -12,6 +12,7 @@
         <option value="$PROJECT_DIR$/notification-service/pom.xml" />
         <option value="$PROJECT_DIR$/service-service/pom.xml" />
         <option value="$PROJECT_DIR$/invoice-service/pom.xml" />
+        <option value="$PROJECT_DIR$/LoginGoogleFacebook/pom.xml" />
       </list>
     </option>
   </component>

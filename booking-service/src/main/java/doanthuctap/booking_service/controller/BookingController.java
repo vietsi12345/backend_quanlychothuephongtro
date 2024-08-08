@@ -64,6 +64,12 @@ public class    BookingController {
         return ResponseEntity.ok(bookings);
     }
 
+    @GetMapping ("/booking-success-status-and-without")
+    public ResponseEntity <List<Booking>> findApprovedBookingsWithoutContract () throws  Exception {
+        List<Booking> bookings = bookingService.findApprovedBookingsWithoutContract();
+        return ResponseEntity.ok(bookings);
+    }
+
     @PostMapping("/update-status/{id}")
     public ResponseEntity <?> updateBookingStatus (
             @PathVariable Long id,

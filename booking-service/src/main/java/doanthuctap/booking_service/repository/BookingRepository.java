@@ -14,6 +14,6 @@ public interface BookingRepository extends JpaRepository <Booking, Long> {
     List <Booking> findByUserIdOrderByIdDesc (Long userId);
 
 //    // lấy danh sách booking ở trạng thái đã duyêtj nhưng chưa có hợp đồng
-//    @Query("SELECT b FROM Booking b WHERE b.status = 'Đã duyệt' AND b.contract IS NULL")
-//    List<Booking> findApprovedBookingsWithoutContract();
+    @Query("SELECT b FROM Booking b WHERE b.status = 'Đã duyệt' AND b.contract IS NULL")
+    List<Booking> findApprovedBookingsWithoutContract();
 }

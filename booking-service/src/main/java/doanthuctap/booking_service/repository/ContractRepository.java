@@ -11,4 +11,5 @@ public interface ContractRepository extends JpaRepository<Contract,Long> {
     List<Contract> findByBookingUserIdOrderByIdDesc(Long userId);
 
     Contract findByBookingId (Long bookingId);
+
 }

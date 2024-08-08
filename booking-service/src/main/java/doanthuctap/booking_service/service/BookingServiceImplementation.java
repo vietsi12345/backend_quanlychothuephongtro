@@ -67,6 +67,11 @@ public class BookingServiceImplementation implements BookingService{
     }
 
     @Override
+    public List<Booking> findApprovedBookingsWithoutContract() {
+        return bookingRepository.findApprovedBookingsWithoutContract();
+    }
+
+    @Override
     public String generateConfirmationCode() {
         return UUID.randomUUID().toString();
     }
