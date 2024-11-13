@@ -1,9 +1,8 @@
 package com.doanthuctap.service;
 
 import com.doanthuctap.model.Room;
-import com.doanthuctap.model.RoomType;
+import com.doanthuctap.model.RoomStatus;
 import com.doanthuctap.response.RoomDto;
-import com.doanthuctap.response.RoomTypeDto;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
@@ -14,19 +13,17 @@ public interface RoomService {
 
     Room getRoomById (Long id) throws  Exception;
 
-    List<Room> getAllRoom () throws  Exception;
+    List<Room> getAllRoomForCustomer () throws  Exception;
+
+    List<Room> getAllRoomForAdmin () throws  Exception;
 
     List<Room> getRoomsByHouseId (Long houseId) throws  Exception;
 
-    Room updateRoom (Long id, BigDecimal price, String description, MultipartFile imageFile) throws  Exception;
+    Room updateRoom (Long id, BigDecimal price, String description,Integer  area,String name, MultipartFile imageFile) throws  Exception;
 
-    void deleteRoom (Long id) throws  Exception;
+    Room deleteRoom (Long id) throws  Exception;
 
-    Room updateStatus (Long id,String status) throws Exception;
+    Room updateStatus (Long id, RoomStatus status) throws Exception;
 
-    List<RoomTypeDto> getRoomTypesWithRoomsByHouseId (Long houseId);
-
-    RoomTypeDto convertToRoomTypeDTO(RoomType roomType,List<Room> rooms);
-
-    RoomDto convertToRoomDTO(Room room);
+    List<Room> getRoomsByHouseIdForAdmin (Long houseId) throws  Exception;
 }

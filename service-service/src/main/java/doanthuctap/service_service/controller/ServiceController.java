@@ -17,6 +17,7 @@ public class ServiceController {
 
     @PostMapping
     public ResponseEntity<Service> createService (@RequestBody Service service) {
+        service.setIsActive(true);
         Service createService = serviceService.createService(service);
         return ResponseEntity.ok(createService);
     }
@@ -26,15 +27,20 @@ public class ServiceController {
         return ResponseEntity.ok (serviceService.getAlLService());
     }
 
+    @GetMapping("/is-active")
+    public ResponseEntity<List<Service>> getAllServiceIsActive () {
+        return ResponseEntity.ok (serviceService.getAlLServiceIsActive());
+    }
+
     @GetMapping ("/{id}")
     public ResponseEntity<Service> getServiceById (@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(serviceService.getServiceById(id));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteService (@PathVariable Long id) {
-        serviceService.deleteService(id);
-        return ResponseEntity.ok("Xóa thành công service có id là:" +id);
+    public ResponseEntity<Service> deleteService (@PathVariable Long id) throws Exception {
+        Service service = serviceService.deleteService(id);
+        return ResponseEntity.ok(service);
     }
 
     @PutMapping ("/{id}")

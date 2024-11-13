@@ -1,8 +1,6 @@
 package doanthuctap.booking_service.controller;
 
-import doanthuctap.booking_service.model.Booking;
-import doanthuctap.booking_service.model.Contract;
-import doanthuctap.booking_service.model.NotificationDto;
+import doanthuctap.booking_service.model.*;
 import doanthuctap.booking_service.repository.BookingRepository;
 import doanthuctap.booking_service.service.ContractService;
 import doanthuctap.booking_service.service.NotificationService;
@@ -24,6 +22,8 @@ public class ContractController {
 
     @Autowired
     private BookingController bookingController;
+    @Autowired
+    private RoomService roomService;
     @Autowired
     private NotificationService notificationService;
 
@@ -52,8 +52,8 @@ public class ContractController {
 
 
     @GetMapping
-    public ResponseEntity<List<Contract>>getAllContract () throws Exception {
-        List<Contract> contracts = contractService.getAllContract();
+    public ResponseEntity<List<ContractResponse>>getAllContract () throws Exception {
+        List<ContractResponse> contracts = contractService.getAllContract();
         return ResponseEntity.ok(contracts);
     }
 
@@ -68,6 +68,8 @@ public class ContractController {
         Contract contract =  contractService.updateStatusContract(id);
         // cập nhật lại trạng thái phiếu đặt
         bookingController.updateBookingStatus(contract.getBooking().getId(),"Đã hủy");
+        // cập nhật lại trạng thái phòng thành "AVAILABLE"
+        RoomDto room = roomService.updateStatus(contract.getBooking().getRoomId(),"AVAILABLE");
         // gửi thông báo tạo chấm dứt hợp đồng  tới user
         NotificationDto notificationDto = new NotificationDto();
         notificationDto.setType("CANCEL_CONTRACT");

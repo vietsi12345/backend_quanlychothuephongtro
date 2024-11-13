@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -22,10 +23,6 @@ public class Booking {
 
     private LocalDate endDate;
 
-    private String adults;
-
-    private String children;
-
     private String confirmationCode;
 
     private String status ; // đang chờ duyệt, đã duyệt, đã hủy
@@ -33,6 +30,8 @@ public class Booking {
     private Long userId;
 
     private Long roomId;
+
+    private LocalDateTime createAt;
 
     @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
     @JsonBackReference

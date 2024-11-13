@@ -9,10 +9,11 @@ public interface ServiceService {
     Service createService (Service service);
 
    List<Service> getAlLService ();
+    List<Service> getAlLServiceIsActive ();
 
     Service  getServiceById (Long id) throws  Exception ;
 
-    void deleteService (Long id) ;
+    Service deleteService (Long id) throws Exception;
 
     Service updateService (Long id, String name, String unit, BigDecimal unitPrice,String description) throws Exception;
 }

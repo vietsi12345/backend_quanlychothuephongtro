@@ -32,11 +32,11 @@ public class InvoiceDetailController {
     public ResponseEntity<InvoiceDetailResponse> createInvoiceDetail (@RequestBody InvoiceDetail invoiceDetail) throws Exception {
         ServiceDto serviceDto = serviceService.getServiceById(invoiceDetail.getServiceId());
         invoiceDetail.setUnitPrice(serviceDto.getUnitPrice());
-        invoiceDetail.setAmount(serviceDto.getUnitPrice().multiply(BigDecimal.valueOf(invoiceDetail.getQuantity())));
+//        invoiceDetail.setAmount(serviceDto.getUnitPrice().multiply(BigDecimal.valueOf(invoiceDetail.getQuantity())));
         // cập nhật lại tổng tiền cho bên invoice
         Invoice invoice = invoiceService.getInvoiceById(invoiceDetail.getInvoiceId());
-        invoice.setTotalService(invoiceDetail.getAmount().add(invoice.getTotalService()));
-        invoice.setTotalAmount(invoiceDetail.getAmount().add(invoice.getTotalAmount()));
+//        invoice.setTotalService(invoiceDetail.getAmount().add(invoice.getTotalService()));
+//        invoice.setTotalAmount(invoiceDetail.getAmount().add(invoice.getTotalAmount()));
         // lưu invoice lại vào cơ sở dữ liệu
         invoiceRepository.save(invoice);
         //
@@ -64,7 +64,7 @@ public class InvoiceDetailController {
         InvoiceDetailResponse invoiceDetailResponse = new InvoiceDetailResponse();
         invoiceDetailResponse.setInvoiceId(invoiceDetail.getInvoiceId());
         invoiceDetailResponse.setId(invoiceDetail.getId());
-        invoiceDetailResponse.setAmount(invoiceDetail.getAmount());
+        invoiceDetailResponse.setAmount(invoiceDetail.getUnitPrice().multiply(BigDecimal.valueOf(invoiceDetail.getQuantity())));
         invoiceDetailResponse.setQuantity(invoiceDetail.getQuantity());
         invoiceDetailResponse.setUnitPrice(invoiceDetail.getUnitPrice());
         ServiceDto serviceDto = serviceService.getServiceById(invoiceDetail.getServiceId());

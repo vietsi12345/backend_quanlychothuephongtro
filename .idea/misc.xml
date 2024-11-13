@@ -12,7 +12,15 @@
         <option value="$PROJECT_DIR$/notification-service/pom.xml" />
         <option value="$PROJECT_DIR$/service-service/pom.xml" />
         <option value="$PROJECT_DIR$/invoice-service/pom.xml" />
+        <option value="$PROJECT_DIR$/LoginGoogleFacebook/pom.xml" />
+        <option value="$PROJECT_DIR$/address-service/pom.xml" />
+        <option value="$PROJECT_DIR$/chat-service/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/LoginGoogleFacebook/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="17" project-jdk-type="JavaSDK">

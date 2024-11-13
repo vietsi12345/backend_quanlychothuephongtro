@@ -3,6 +3,7 @@ package doanthuctap.invoice_service.controller;
 import com.netflix.discovery.converters.Auto;
 import doanthuctap.invoice_service.model.ContractDto;
 import doanthuctap.invoice_service.model.Invoice;
+import doanthuctap.invoice_service.model.InvoiceResponse;
 import doanthuctap.invoice_service.model.RoomDto;
 import doanthuctap.invoice_service.service.ContractService;
 import doanthuctap.invoice_service.service.InvoiceService;
@@ -40,10 +41,10 @@ public class InvoiceController {
             System.out.println("contract: "+contractDto);
             RoomDto roomDto = roomService.getRoomById(contractDto.getBooking().getRoomId());
             //
-            invoice.setRoomPrice(roomDto.getPrice());
-            invoice.setTotalService(BigDecimal.valueOf(0));
-            invoice.setTotalAmount(roomDto.getPrice());
-            Invoice createInvoice = invoiceService.createInvoice(invoice);
+//            invoice.setRoomPrice(roomDto.getPrice());
+//            invoice.setTotalService(BigDecimal.valueOf(0));
+//            invoice.setTotalAmount(roomDto.getPrice());
+            InvoiceResponse createInvoice = invoiceService.createInvoice(invoice);
             return ResponseEntity.ok(createInvoice);
         }
     }
@@ -59,12 +60,12 @@ public class InvoiceController {
     }
 
     @GetMapping("/by-contract/{id}")
-    public ResponseEntity<List<Invoice>> getInvoiceForContract (@PathVariable Long id){
+    public ResponseEntity<List<InvoiceResponse>> getInvoiceForContract (@PathVariable Long id) throws Exception {
         return  ResponseEntity.ok(invoiceService.getInvoiceByContractId(id));
     }
 
     @PutMapping ("/{id}")
-    public ResponseEntity <Invoice> updateInvoice (@PathVariable Long id,
+    public ResponseEntity <InvoiceResponse> updateInvoice (@PathVariable Long id,
                                                    @RequestParam (required = false)LocalDate dueDate) throws Exception {
         return ResponseEntity.ok(invoiceService.updateInvoice(id,dueDate));
     }

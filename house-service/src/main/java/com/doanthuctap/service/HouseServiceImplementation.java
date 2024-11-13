@@ -1,6 +1,6 @@
 package com.doanthuctap.service;
 
-import com.doanthuctap.model.Address;
+import com.doanthuctap.model.CommunesDto;
 import com.doanthuctap.model.House;
 import com.doanthuctap.repository.HouseRepository;
 import com.doanthuctap.repository.RoomRepository;
@@ -10,9 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class HouseServiceImplementation implements HouseService{
@@ -22,27 +21,55 @@ public class HouseServiceImplementation implements HouseService{
 
     @Autowired
     private RoomRepository roomRepository;
+    @Autowired
+    private CommunesService communesService;
 
     @Override
-    public House createHouse(House house, MultipartFile imageFile) throws Exception {
+    public HouseWithMinPrice createHouse(House house, MultipartFile imageFile) throws Exception {
         if (imageFile != null && !imageFile.isEmpty()) {
             house.setImage(imageFile.getBytes());
         }
-        return houseRepository.save(house);
-    }
+        house.setIsActive(true);
+        houseRepository.save(house);
 
-    @Override
-    public HouseWithMinPrice getHouseById(Long id) throws Exception {
-        House house = houseRepository.findById(id).orElseThrow(() -> new Exception("House not found"));
+        // trả về để xuất ra fontend
         BigDecimal minRoomPrice = roomRepository.findMinPriceByHouseId(house.getId());
+        CommunesDto commune = communesService.getCommunesById(house.getIdCommune());
+
         HouseWithMinPrice houseWithMinPrice = new HouseWithMinPrice();
         houseWithMinPrice.setId(house.getId());
         houseWithMinPrice.setName(house.getName());
         houseWithMinPrice.setDescription(house.getDescription());
-        houseWithMinPrice.setStreet(house.getAddress().getStreet());
-        houseWithMinPrice.setWard(house.getAddress().getWard());
-        houseWithMinPrice.setDistrict(house.getAddress().getDistrict());
-        houseWithMinPrice.setCity(house.getAddress().getCity());
+        houseWithMinPrice.setAddressDetails(house.getAddressDetails());
+        houseWithMinPrice.setIsActive(house.getIsActive());
+        houseWithMinPrice.setIdCommune(house.getIdCommune());
+        houseWithMinPrice.setCommune(commune.getName());
+        houseWithMinPrice.setDistrict(commune.getDistrict().getName());
+        houseWithMinPrice.setProvince(commune.getDistrict().getProvince().getName());
+        houseWithMinPrice.setMinRoomPrice(minRoomPrice != null ? minRoomPrice : BigDecimal.ZERO);
+
+        if (house.getImage() != null) {
+            houseWithMinPrice.setImageBase64(Base64.getEncoder().encodeToString(house.getImage()));
+        }
+        return houseWithMinPrice ;
+    }
+
+    @Override
+    public HouseWithMinPrice getHouseById(Long id) throws Exception {
+        House house = houseRepository.findById(id).orElseThrow(() -> new Exception("House not founds"));
+        BigDecimal minRoomPrice = roomRepository.findMinPriceByHouseId(house.getId());
+        CommunesDto commune = communesService.getCommunesById(house.getIdCommune());
+
+        HouseWithMinPrice houseWithMinPrice = new HouseWithMinPrice();
+        houseWithMinPrice.setId(house.getId());
+        houseWithMinPrice.setName(house.getName());
+        houseWithMinPrice.setDescription(house.getDescription());
+        houseWithMinPrice.setAddressDetails(house.getAddressDetails());
+        houseWithMinPrice.setIsActive(house.getIsActive());
+        houseWithMinPrice.setIdCommune(house.getIdCommune());
+        houseWithMinPrice.setCommune(commune.getName());
+        houseWithMinPrice.setDistrict(commune.getDistrict().getName());
+        houseWithMinPrice.setProvince(commune.getDistrict().getProvince().getName());
         houseWithMinPrice.setMinRoomPrice(minRoomPrice != null ? minRoomPrice : BigDecimal.ZERO);
 
         if (house.getImage() != null) {
@@ -53,14 +80,36 @@ public class HouseServiceImplementation implements HouseService{
     }
 
     @Override
-    public List<House> getAllHouse() throws Exception {
+    public List<HouseWithMinPrice> getAllHouse() throws Exception {
         List<House> houses = houseRepository.findAll();
-        return houses;
+        List <HouseWithMinPrice> houseWithMinPrices = new ArrayList<>();
+        for (House house : houses) {
+            BigDecimal minRoomPrice = roomRepository.findMinPriceByHouseId(house.getId());
+            CommunesDto commune = communesService.getCommunesById(house.getIdCommune());
+
+            HouseWithMinPrice houseWithMinPrice = new HouseWithMinPrice();
+            houseWithMinPrice.setId(house.getId());
+            houseWithMinPrice.setName(house.getName());
+            houseWithMinPrice.setDescription(house.getDescription());
+            houseWithMinPrice.setAddressDetails(house.getAddressDetails());
+            houseWithMinPrice.setIsActive(house.getIsActive());
+            houseWithMinPrice.setIdCommune(house.getIdCommune());
+            houseWithMinPrice.setCommune(commune.getName());
+            houseWithMinPrice.setDistrict(commune.getDistrict().getName());
+            houseWithMinPrice.setProvince(commune.getDistrict().getProvince().getName());
+            houseWithMinPrice.setMinRoomPrice(minRoomPrice != null ? minRoomPrice : BigDecimal.ZERO);
+
+            if (house.getImage() != null) {
+                houseWithMinPrice.setImageBase64(Base64.getEncoder().encodeToString(house.getImage()));
+            }
+            houseWithMinPrices.add(houseWithMinPrice);
+        }
+        return houseWithMinPrices;
     }
 
     @Override
-    public House updateHouse(Long id, String name, String description, String street, String ward, String district, String city, MultipartFile imageFile) throws Exception {
-        House house = houseRepository.findById(id).orElseThrow(() -> new Exception("House not found"));
+    public HouseWithMinPrice updateHouse(Long id, String name, String description, String idCommune, String addressDetials, MultipartFile imageFile) throws Exception {
+        House house = houseRepository.findById(id).orElseThrow(() -> new Exception("House not founds"));
 
         if (name != null && !name.isEmpty()) {
             house.setName(name);
@@ -68,69 +117,113 @@ public class HouseServiceImplementation implements HouseService{
         if (description != null && !description.isEmpty()) {
             house.setDescription(description);
         }
-        if ((street != null && !street.isEmpty()) ||
-                (ward != null && !ward.isEmpty()) ||
-                (district != null && !district.isEmpty()) ||
-                (city != null && !city.isEmpty())) {
-
-            Address address = house.getAddress();
-            if (address == null) {
-                address = new Address();
-            }
-            if (street != null && !street.isEmpty()) {
-                address.setStreet(street);
-            }
-            if (ward != null && !ward.isEmpty()) {
-                address.setWard(ward);
-            }
-            if (district != null && !district.isEmpty()) {
-                address.setDistrict(district);
-            }
-            if (city != null && !city.isEmpty()) {
-                address.setCity(city);
-            }
-            house.setAddress(address);
+        if (idCommune != null && !idCommune.isEmpty()) {
+            house.setIdCommune(Long.valueOf(idCommune));
+        }
+        if (addressDetials != null && !addressDetials.isEmpty()) {
+            house.setAddressDetails(addressDetials);
         }
         if (imageFile != null && !imageFile.isEmpty()) {
             house.setImage(imageFile.getBytes());
         }
+        houseRepository.save(house);
+        // đổi để xuất ra frontend
+        BigDecimal minRoomPrice = roomRepository.findMinPriceByHouseId(house.getId());
+        CommunesDto commune = communesService.getCommunesById(house.getIdCommune());
 
-        return houseRepository.save(house);
+        HouseWithMinPrice houseWithMinPrice = new HouseWithMinPrice();
+        houseWithMinPrice.setId(house.getId());
+        houseWithMinPrice.setName(house.getName());
+        houseWithMinPrice.setDescription(house.getDescription());
+        houseWithMinPrice.setAddressDetails(house.getAddressDetails());
+        houseWithMinPrice.setIsActive(house.getIsActive());
+        houseWithMinPrice.setIdCommune(house.getIdCommune());
+        houseWithMinPrice.setCommune(commune.getName());
+        houseWithMinPrice.setDistrict(commune.getDistrict().getName());
+        houseWithMinPrice.setProvince(commune.getDistrict().getProvince().getName());
+        houseWithMinPrice.setMinRoomPrice(minRoomPrice != null ? minRoomPrice : BigDecimal.ZERO);
+
+        if (house.getImage() != null) {
+            houseWithMinPrice.setImageBase64(Base64.getEncoder().encodeToString(house.getImage()));
+        }
+        return houseWithMinPrice;
     }
     @Override
-    public void deleteHouse(Long id ) throws Exception {
-      House house = houseRepository.findById(id).orElseThrow(() -> new Exception("House not found"));
-      houseRepository.delete(house);
+    public HouseWithMinPrice deleteHouse(Long id ) throws Exception {
+      House house = houseRepository.findById(id).orElseThrow(() -> new Exception("House not founds"));
+      house.setIsActive(false);
+      houseRepository.save(house);
+
+      // đổi để xuất ra fontend
+        BigDecimal minRoomPrice = roomRepository.findMinPriceByHouseId(house.getId());
+        CommunesDto commune = communesService.getCommunesById(house.getIdCommune());
+
+        HouseWithMinPrice houseWithMinPrice = new HouseWithMinPrice();
+        houseWithMinPrice.setId(house.getId());
+        houseWithMinPrice.setName(house.getName());
+        houseWithMinPrice.setDescription(house.getDescription());
+        houseWithMinPrice.setAddressDetails(house.getAddressDetails());
+        houseWithMinPrice.setIsActive(house.getIsActive());
+        houseWithMinPrice.setIdCommune(house.getIdCommune());
+        houseWithMinPrice.setCommune(commune.getName());
+        houseWithMinPrice.setDistrict(commune.getDistrict().getName());
+        houseWithMinPrice.setProvince(commune.getDistrict().getProvince().getName());
+        houseWithMinPrice.setMinRoomPrice(minRoomPrice != null ? minRoomPrice : BigDecimal.ZERO);
+
+        if (house.getImage() != null) {
+            houseWithMinPrice.setImageBase64(Base64.getEncoder().encodeToString(house.getImage()));
+        }
+        return houseWithMinPrice;
     }
 
     @Override
     public List<String> getAllDistinctCities() throws Exception {
-        return houseRepository.findAllDistinctCities();
+        // Lấy danh sách idCommune từ HouseRepository
+        List<Long> allDistinctCommuneIds = houseRepository.findDistinctActiveCommuneIds();
+
+        // Khai báo Set để chứa tên tỉnh/thành phố duy nhất
+        Set<String> uniqueProvinceNames = new HashSet<>();
+
+        // Lấy danh sách CommunesDto và tên tỉnh/thành phố
+        for (Long communeId : allDistinctCommuneIds) {
+            CommunesDto commune = communesService.getCommunesById(communeId);
+            String provinceName = commune.getDistrict().getProvince().getName();
+            uniqueProvinceNames.add(provinceName); // Chỉ thêm tên tỉnh/thành phố duy nhất
+        }
+
+        // Chuyển Set thành List trước khi trả về
+        return new ArrayList<>(uniqueProvinceNames);
     }
 
     @Override
     public List<HouseWithMinPrice> getHousesByCity(String city) throws Exception {
-        List <House> houses = houseRepository.findByAddress_City(city);
+        List <House> houses = houseRepository.findAll();
         List<HouseWithMinPrice> houseWithMinPrices = new ArrayList<>();
 
         for (House house : houses) {
-            BigDecimal minRoomPrice = roomRepository.findMinPriceByHouseId(house.getId());
+            Long idCommune= house.getIdCommune();
+            CommunesDto commune = communesService.getCommunesById(idCommune);
+            String provinceName = commune.getDistrict().getProvince().getName();
+            System.out.println(provinceName);
+            if (city.equals(provinceName)) {
+                BigDecimal minRoomPrice = roomRepository.findMinPriceByHouseId(house.getId());
+                HouseWithMinPrice houseWithMinPrice = new HouseWithMinPrice();
+                houseWithMinPrice.setId(house.getId());
+                houseWithMinPrice.setName(house.getName());
+                houseWithMinPrice.setDescription(house.getDescription());
+                houseWithMinPrice.setAddressDetails(house.getAddressDetails());
+                houseWithMinPrice.setIsActive(house.getIsActive());
+                houseWithMinPrice.setIdCommune(house.getIdCommune());
+                houseWithMinPrice.setCommune(commune.getName());
+                houseWithMinPrice.setDistrict(commune.getDistrict().getName());
+                houseWithMinPrice.setProvince(commune.getDistrict().getProvince().getName());
+                houseWithMinPrice.setMinRoomPrice(minRoomPrice != null ? minRoomPrice : BigDecimal.ZERO);
 
-            HouseWithMinPrice houseWithMinPrice = new HouseWithMinPrice();
-            houseWithMinPrice.setId(house.getId());
-            houseWithMinPrice.setName(house.getName());
-            houseWithMinPrice.setDescription(house.getDescription());
-            houseWithMinPrice.setStreet(house.getAddress().getStreet());
-            houseWithMinPrice.setWard(house.getAddress().getWard());
-            houseWithMinPrice.setDistrict(house.getAddress().getDistrict());
-            houseWithMinPrice.setCity(house.getAddress().getCity());
-            houseWithMinPrice.setMinRoomPrice(minRoomPrice != null ? minRoomPrice : BigDecimal.ZERO);
-
-            if (house.getImage() != null) {
-                houseWithMinPrice.setImageBase64(Base64.getEncoder().encodeToString(house.getImage()));
+                if (house.getImage() != null) {
+                    houseWithMinPrice.setImageBase64(Base64.getEncoder().encodeToString(house.getImage()));
+                }
+                houseWithMinPrices.add(houseWithMinPrice);
             }
-
-            houseWithMinPrices.add(houseWithMinPrice);
         }
         return houseWithMinPrices;
     }
@@ -142,23 +235,30 @@ public class HouseServiceImplementation implements HouseService{
 
         for (House house : houses) {
             BigDecimal minRoomPrice = roomRepository.findMinPriceByHouseId(house.getId());
+            CommunesDto commune = communesService.getCommunesById(house.getIdCommune());
 
             HouseWithMinPrice houseWithMinPrice = new HouseWithMinPrice();
             houseWithMinPrice.setId(house.getId());
             houseWithMinPrice.setName(house.getName());
             houseWithMinPrice.setDescription(house.getDescription());
-            houseWithMinPrice.setStreet(house.getAddress().getStreet());
-            houseWithMinPrice.setWard(house.getAddress().getWard());
-            houseWithMinPrice.setDistrict(house.getAddress().getDistrict());
-            houseWithMinPrice.setCity(house.getAddress().getCity());
+            houseWithMinPrice.setAddressDetails(house.getAddressDetails());
+            houseWithMinPrice.setIsActive(house.getIsActive());
+            houseWithMinPrice.setIdCommune(house.getIdCommune());
+            houseWithMinPrice.setCommune(commune.getName());
+            houseWithMinPrice.setDistrict(commune.getDistrict().getName());
+            houseWithMinPrice.setProvince(commune.getDistrict().getProvince().getName());
             houseWithMinPrice.setMinRoomPrice(minRoomPrice != null ? minRoomPrice : BigDecimal.ZERO);
 
             if (house.getImage() != null) {
                 houseWithMinPrice.setImageBase64(Base64.getEncoder().encodeToString(house.getImage()));
             }
-
             houseWithMinPrices.add(houseWithMinPrice);
         }
         return houseWithMinPrices;
+    }
+
+    @Override
+    public List<House> getAllHouseIsActive() {
+        return houseRepository.findByIsActiveTrue();
     }
 }

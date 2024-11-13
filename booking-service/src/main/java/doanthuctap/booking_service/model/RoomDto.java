@@ -19,11 +19,10 @@ public class RoomDto {
     @Lob
     @Column(length = 10000)
     private String description ;
-    private String availability;
+    private String status;
     @Lob
     @Column( columnDefinition = "LONGBLOB")
     private byte[] image;
 
     private Long houseId;
-    private Long roomTypeId;
 }

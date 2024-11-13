@@ -17,10 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -33,6 +30,8 @@ public class AuthController {
     private CustomerUserServiceImplementation customerUserDetails;
     @Autowired
     private UserService userService;
+
+
 
     @PostMapping("/signup")
     public ResponseEntity <?> CreateUserHandler(
@@ -92,6 +91,19 @@ public class AuthController {
             return ResponseEntity.status(226).body("Sai thông tin đăng nhập!!!");
         }
     }
+
+    @GetMapping("/find-by-email")
+    public ResponseEntity<Boolean> findByEmail (@RequestParam String email) {
+        System.out.println("mail: "+email   );
+        User user= userRepository.findByEmail(email);
+        System.out.println(user);
+        if(user == null ){
+            return ResponseEntity.ok(false);
+        } else {
+            return ResponseEntity.ok(true);
+        }
+    }
+
 
     private Authentication authenticate(String userName, String password) {
         UserDetails userDetails  = customerUserDetails.loadUserByUsername(userName);

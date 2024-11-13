@@ -20,32 +20,25 @@ public class Room {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Long id;
 
+    private String name;
     private BigDecimal price;
+
+    private int area;
 
     @Lob
     @Column(length = 10000)
     private String description ;
-    private String availability;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private RoomStatus status;
     @Lob
     @Column(name = "image", columnDefinition = "LONGBLOB")
     private byte[] image;
 
-//    @ManyToOne
-//    @JoinColumn(name = "houseId", nullable = false)
-//    @JsonBackReference
-//    private House house;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "roomTypeId", nullable = false)
-//    @JsonBackReference
-//    private RoomType roomType;
     @ManyToOne
     @JoinColumn(name = "houseId", nullable = false)
     @JsonIgnoreProperties("rooms")
     private House house;
 
-    @ManyToOne
-    @JoinColumn(name = "roomTypeId", nullable = false)
-    @JsonIgnoreProperties("rooms")
-    private RoomType roomType;
 }

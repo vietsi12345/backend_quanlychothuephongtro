@@ -17,6 +17,11 @@ public class ServiceServiceImplementation implements ServiceService {
     }
 
     @Override
+    public List<Service> getAlLServiceIsActive() {
+        return serviceRepository.findByIsActiveTrue();
+    }
+
+    @Override
     public List<Service> getAlLService() {
         return serviceRepository.findAll();
     }
@@ -27,8 +32,11 @@ public class ServiceServiceImplementation implements ServiceService {
     }
 
     @Override
-    public void deleteService(Long id) {
-        serviceRepository.deleteById(id);
+    public Service deleteService(Long id) throws Exception {
+        Service service = getServiceById(id);
+        service.setIsActive(false);
+        serviceRepository.save(service);
+        return service;
     }
 
     @Override

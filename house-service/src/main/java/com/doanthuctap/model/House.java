@@ -20,7 +20,8 @@ public class House {
     private Long id;
 
     private String name;
-
+    private Boolean isActive;
+    private String addressDetails;
     @Lob
     @Column(name = "image", columnDefinition = "LONGBLOB")
     private byte[] image;
@@ -29,8 +30,7 @@ public class House {
     @Column(length = 10000)
     private String description;
 
-    @Embedded
-    private Address address;
+    private Long idCommune;
 
 //    @OneToMany(mappedBy = "house")
 //    @JsonManagedReference

@@ -23,10 +23,10 @@ public class Invoice {
     private Long id;
 
     private Long contractId;
-    private BigDecimal roomPrice;
+//    private BigDecimal roomPrice;
     private YearMonth billMonth;
-    private BigDecimal totalService;
-    private BigDecimal totalAmount;
+//    private BigDecimal totalService;
+//    private BigDecimal totalAmount;
     private LocalDateTime createdAt;
     private String Status;
     private LocalDate dueDate;

@@ -24,4 +24,6 @@ public class Service {
     private BigDecimal unitPrice;
 
     private String  description;
+
+    private Boolean isActive;
 }

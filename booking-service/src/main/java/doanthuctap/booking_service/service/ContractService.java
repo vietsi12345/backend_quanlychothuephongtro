@@ -1,6 +1,7 @@
 package doanthuctap.booking_service.service;
 
 import doanthuctap.booking_service.model.Contract;
+import doanthuctap.booking_service.model.ContractResponse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 public interface ContractService {
     Contract createContract (Contract contract) throws Exception;
 
-    List<Contract> getAllContract () throws  Exception;
+    List<ContractResponse> getAllContract () throws  Exception;
 
     Contract getContractById (Long id) throws  Exception;
 
@@ -18,4 +19,6 @@ public interface ContractService {
     Contract updateStatusContract (Long id) throws Exception;
 
     List<Contract> getContractForUser (Long userId) ;
+
+    ContractResponse convertContractResponse (Contract contract) throws Exception;
 }

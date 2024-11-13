@@ -9,6 +9,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +29,7 @@ public class BookingServiceImplementation implements BookingService{
     public Booking createBooking(Booking booking) throws Exception {
         booking.setConfirmationCode(generateConfirmationCode());
         booking.setStatus("Đang chờ duyệt");
+        booking.setCreateAt(LocalDateTime.now());
         //lưu booking
         Booking savedBooking = bookingRepository.save(booking);
         NotificationDto notificationDto = new NotificationDto();
@@ -67,7 +69,25 @@ public class BookingServiceImplementation implements BookingService{
     }
 
     @Override
-    public String generateConfirmationCode() {
-        return UUID.randomUUID().toString();
+    public List<Booking> findApprovedBookingsWithoutContract() {
+        return bookingRepository.findApprovedBookingsWithoutContract();
     }
+
+//    @Override
+//    public String generateConfirmationCode() {
+//        return UUID.randomUUID().toString();
+//    }
+@Override
+public String generateConfirmationCode() {
+    int min = 10000000;
+    int max = 99999999;
+    int confirmationCode = (int) (Math.random() * (max - min + 1)) + min;
+
+    // Kiểm tra xem mã xác nhận đã tồn tại trong cơ sở dữ liệu chưa
+    while (bookingRepository.findByConfirmationCode(String.valueOf(confirmationCode)) != null) {
+        confirmationCode = (int) (Math.random() * (max - min + 1)) + min;
+    }
+
+    return String.valueOf(confirmationCode);
+}
 }

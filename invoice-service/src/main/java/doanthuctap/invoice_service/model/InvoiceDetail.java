@@ -22,5 +22,5 @@ public class InvoiceDetail {
 
     private Integer quantity;
     private BigDecimal unitPrice;
-    private BigDecimal amount;
+//    private BigDecimal amount;
 }

@@ -12,7 +12,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice,Long> {
     List<Invoice> findByContractIdOrderByCreatedAtDesc (long contractId);
 
 
-    @Query("SELECT i FROM Invoice i WHERE YEAR(i.createdAt) = :year")
+    @Query("SELECT i FROM Invoice i WHERE YEAR(i.createdAt) = :year ORDER BY MONTH(i.createdAt) ASC")
     List<Invoice> findByYear(@Param("year") int year);
 
 }

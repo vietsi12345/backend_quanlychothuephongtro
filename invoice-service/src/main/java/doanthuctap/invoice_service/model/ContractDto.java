@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -19,7 +20,8 @@ public class ContractDto {
     private LocalDate endDate;
     private String status;
     private String note;
-
+    private BigDecimal priceRoom;
+    private BigDecimal deposit;
     private BookingDto booking;
 
 }
