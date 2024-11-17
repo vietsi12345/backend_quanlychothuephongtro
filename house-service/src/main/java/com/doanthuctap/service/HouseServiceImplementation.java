@@ -261,4 +261,5 @@ public class HouseServiceImplementation implements HouseService{
     public List<House> getAllHouseIsActive() {
         return houseRepository.findByIsActiveTrue();
     }
+
 }

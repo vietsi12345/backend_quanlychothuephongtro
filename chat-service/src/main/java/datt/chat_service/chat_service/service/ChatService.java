@@ -1,6 +1,7 @@
 package datt.chat_service.chat_service.service;
 
 import datt.chat_service.chat_service.model.ChatRoom;
+import datt.chat_service.chat_service.model.ChatRoomResponse;
 import datt.chat_service.chat_service.model.Message;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
 public interface ChatService {
     ChatRoom getOrCreateChatRoom(Long customerId);
 
-    List<ChatRoom> getAllChatRoomsForAdmin();
+    List<ChatRoomResponse> getAllChatRoomsForAdmin() throws Exception;
     Message sendMessage(Long chatRoomId, Long senderId, String content, String messageType);
     List<Message> getChatMessages(Long chatRoomId);
     void markMessagesAsRead(Long chatRoomId, Long userId);
@@ -20,4 +21,6 @@ public interface ChatService {
     int getUnreadMessageCountForCustomer (Long customerId);
     //đánh dấu những tin nhắn chưa đọc của customer thành đã đọc
     int markMessagesAsReadForCustomer(Long customerId) ;
+
+    ChatRoomResponse convertChatRoomToChatRoomRps (ChatRoom chatRoom) throws Exception;
 }

@@ -54,6 +54,7 @@ public class AuthController {
         createdUser.setFullName(fullName);
         createdUser.setPassword(passwordEncoder.encode(password));
         createdUser.setPhone(phone);
+        createdUser.setIsActive(true);
         createdUser.setRole(role);
 
         User saveUser= userRepository.save(createdUser);

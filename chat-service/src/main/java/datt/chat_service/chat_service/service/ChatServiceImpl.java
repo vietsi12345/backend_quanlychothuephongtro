@@ -1,13 +1,16 @@
 package datt.chat_service.chat_service.service;
 
 import datt.chat_service.chat_service.model.ChatRoom;
+import datt.chat_service.chat_service.model.ChatRoomResponse;
 import datt.chat_service.chat_service.model.Message;
+import datt.chat_service.chat_service.model.UserDto;
 import datt.chat_service.chat_service.repository.ChatRoomRepository;
 import datt.chat_service.chat_service.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,6 +20,8 @@ public class ChatServiceImpl implements ChatService {
     private  ChatRoomRepository chatRoomRepository;
     @Autowired
     private  MessageRepository messageRepository;
+    @Autowired
+    private  UserService userService;
 
     @Override
     public ChatRoom getOrCreateChatRoom(Long customerId) {
@@ -31,8 +36,15 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public List<ChatRoom> getAllChatRoomsForAdmin() {
-        return chatRoomRepository.findAllByOrderByLastMessageAtDesc();
+    public List<ChatRoomResponse> getAllChatRoomsForAdmin() throws Exception {
+        List<ChatRoom> chatRooms =  chatRoomRepository.findAllByOrderByLastMessageAtDesc();
+        List <ChatRoomResponse> chatRoomResponses = new ArrayList<>();
+        for (ChatRoom chatRoom:chatRooms){
+            ChatRoomResponse chatRoomResponse = new ChatRoomResponse();
+            chatRoomResponse = convertChatRoomToChatRoomRps(chatRoom);
+            chatRoomResponses.add(chatRoomResponse);
+        }
+        return chatRoomResponses;
     }
 
     @Override
@@ -91,5 +103,17 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public int markMessagesAsReadForCustomer(Long customerId) {
         return messageRepository.markAllMessagesAsReadForCustomer(customerId);
+    }
+
+    @Override
+    public ChatRoomResponse convertChatRoomToChatRoomRps(ChatRoom chatRoom) throws Exception {
+        ChatRoomResponse chatRoomResponse = new ChatRoomResponse();
+        UserDto customer = userService.getUserById(chatRoom.getCustomerId());
+        chatRoomResponse.setId(chatRoom.getId());
+        chatRoomResponse.setCustomer(customer);
+        chatRoomResponse.setMessages(chatRoom.getMessages());
+        chatRoomResponse.setLastMessageAt(chatRoom.getLastMessageAt());
+        chatRoomResponse.setActive(chatRoom.isActive());
+        return chatRoomResponse;
     }
 }

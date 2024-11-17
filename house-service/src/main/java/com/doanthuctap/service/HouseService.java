@@ -25,4 +25,6 @@ public interface HouseService {
     List <HouseWithMinPrice> getSearchByName (String name) throws Exception;
 
     List <House> getAllHouseIsActive ();
+
+
 }

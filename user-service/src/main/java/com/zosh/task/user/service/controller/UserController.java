@@ -25,8 +25,13 @@ public class UserController {
         User user = userService.getUserProfile(jwt);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
+//    @GetMapping("/{id}")
+//    public ResponseEntity<User> getUserById(@RequestHeader ("Authorization") String jwt, @PathVariable Long id) throws Exception {
+//        User user = userService.getUserById(id);
+//        return new ResponseEntity<>(user, HttpStatus.OK);
+//    }
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@RequestHeader ("Authorization") String jwt, @PathVariable Long id) throws Exception {
+    public ResponseEntity<User> getUserById( @PathVariable Long id) throws Exception {
         User user = userService.getUserById(id);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -48,5 +53,21 @@ public class UserController {
             User newUser = userService.newPassword(jwt,pwNew);
             return ResponseEntity.ok().body(newUser);
         }
+    }
+
+    @GetMapping ("/get-all-customer-or-staff")
+    public ResponseEntity<List<User>> getAllStaffOrCustomer (@RequestParam ("role") String role){
+        List<User> users = userService.GetAllStaffOrCustomer(role);
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @PutMapping("/cancel/{id}")
+    public ResponseEntity<User> cancelUser (@PathVariable Long id) throws Exception {
+        User user = userService.cancelUser(id);
+        return ResponseEntity.ok(user);
+    }
+    @PostMapping
+    public ResponseEntity<User> addUser (@RequestBody User user) throws Exception {
+        return ResponseEntity.ok(userService.addUser(user));
     }
 }

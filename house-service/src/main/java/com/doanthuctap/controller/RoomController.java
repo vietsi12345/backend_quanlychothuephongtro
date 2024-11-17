@@ -4,7 +4,9 @@ import com.doanthuctap.model.House;
 import com.doanthuctap.model.Room;
 import com.doanthuctap.model.RoomStatus;
 import com.doanthuctap.repository.HouseRepository;
+import com.doanthuctap.response.RoomFilter;
 import com.doanthuctap.service.HouseService;
+import com.doanthuctap.service.RoomFilterService;
 import com.doanthuctap.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,9 @@ public class RoomController {
 
     @Autowired
     private HouseService houseService;
+
+    @Autowired
+    private RoomFilterService roomFilterService;
 
     @Autowired
     private HouseRepository houseRepository;
@@ -100,5 +105,19 @@ public class RoomController {
                                               @RequestParam ("status") RoomStatus status) throws Exception {
         Room  room = roomService.updateStatus(id,status);
         return  ResponseEntity.ok(room);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<RoomFilter>> filterRooms(
+            @RequestParam(required = false) Long province,
+            @RequestParam(required = false) Long district,
+            @RequestParam(required = false) Long commune,
+            @RequestParam(required = false) String priceRange,
+            @RequestParam(required = false) String areaRange) throws Exception {
+
+        List<RoomFilter> filteredHouses = roomFilterService.filterRooms(
+                 province, district, commune, priceRange, areaRange);
+
+        return ResponseEntity.ok(filteredHouses);
     }
 }

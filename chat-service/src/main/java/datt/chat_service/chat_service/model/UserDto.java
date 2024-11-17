@@ -1,25 +1,18 @@
-package com.zosh.task.user.service.modal;
+package datt.chat_service.chat_service.model;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@Table(name = "users")
-public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserDto {
     private  Long id;
 
     private String password;
     private String email;
     private String role;
-    private Boolean isActive;
     private String phone;
     private String fullName;
-
 }

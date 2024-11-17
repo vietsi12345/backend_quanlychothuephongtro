@@ -1,10 +1,12 @@
 package datt.chat_service.chat_service.controller;
 
 import datt.chat_service.chat_service.model.ChatRoom;
+import datt.chat_service.chat_service.model.ChatRoomResponse;
 import datt.chat_service.chat_service.model.Message;
 import datt.chat_service.chat_service.service.ChatService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,8 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin
 public class ChatController {
-
-    private final ChatService chatService;
+    private  final ChatService chatService;
 
     @GetMapping("/room/{customerId}")
     public ResponseEntity<ChatRoom> getOrCreateChatRoom(@PathVariable Long customerId) {
@@ -27,7 +28,7 @@ public class ChatController {
     }
 
     @GetMapping("/admin/rooms")
-    public ResponseEntity<List<ChatRoom>> getAllChatRoomsForAdmin() {
+    public ResponseEntity<List<ChatRoomResponse>> getAllChatRoomsForAdmin() throws Exception {
         return ResponseEntity.ok(chatService.getAllChatRoomsForAdmin());
     }
 

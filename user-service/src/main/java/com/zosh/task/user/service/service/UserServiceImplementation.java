@@ -42,5 +42,24 @@ public class UserServiceImplementation implements UserService{
         return userRepository.findById(id).orElseThrow(() -> new Exception("Không tìm thấy user!"));
     }
 
+    @Override
+    public List<User> GetAllStaffOrCustomer(String role) {
+        return userRepository.findByRole(role);
+    }
+
+    @Override
+    public User cancelUser(Long id) throws Exception {
+        User user = getUserById(id);
+        user.setIsActive(false);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User addUser(User user) {
+        user.setIsActive(true);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+    }
+
 
 }
