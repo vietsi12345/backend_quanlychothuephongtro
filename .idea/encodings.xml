@@ -14,6 +14,8 @@
     <file url="file://$PROJECT_DIR$/house-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/house-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/invoice-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/maintenance-service/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/maintenance-service/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notification-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/service-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/user-service/src/main/java" charset="UTF-8" />

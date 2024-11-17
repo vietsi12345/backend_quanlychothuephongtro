@@ -14,6 +14,7 @@
         <module name="task-user-service" />
         <module name="chat-service" />
         <module name="eureka-server" />
+        <module name="maintenance" />
         <module name="gateway" />
         <module name="notification-service" />
       </profile>
@@ -28,6 +29,7 @@
       <module name="gateway" options="-parameters" />
       <module name="house-service" options="-parameters" />
       <module name="invoice-service" options="-parameters" />
+      <module name="maintenance" options="-parameters" />
       <module name="notification-service" options="-parameters" />
       <module name="service-service" options="-parameters" />
       <module name="task-user-service" options="-parameters" />

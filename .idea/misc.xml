@@ -15,6 +15,7 @@
         <option value="$PROJECT_DIR$/LoginGoogleFacebook/pom.xml" />
         <option value="$PROJECT_DIR$/address-service/pom.xml" />
         <option value="$PROJECT_DIR$/chat-service/pom.xml" />
+        <option value="$PROJECT_DIR$/maintenance-service/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
