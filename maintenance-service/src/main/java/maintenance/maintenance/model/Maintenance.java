@@ -43,7 +43,7 @@ public class Maintenance {
 //    @ManyToOne
 //    @JoinColumn(name = "contractId", nullable = false)
 //    @JsonIgnore
-    private Long contractId;
+     private Long roomID;
 
     /*@OneToMany(mappedBy = "maintenance")
     @JsonIgnoreProperties("maintenance")

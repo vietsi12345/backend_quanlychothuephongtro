@@ -15,10 +15,8 @@ import java.util.List;
 @Repository
 public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> {
 
-    Page<Maintenance> findAll(Pageable pageable);
-
-    Page<Maintenance> findByContractId(Long contractId, Pageable pageable);
-    Page<Maintenance> findByStatus(Integer status, Pageable pageable);
+    List<Maintenance> findByRoomID(Long roomID);
+    List<Maintenance> findByStatus(Integer status);
     //List<Maintenance> findByHandlerID(Long handlerID);
 
     /*@Procedure

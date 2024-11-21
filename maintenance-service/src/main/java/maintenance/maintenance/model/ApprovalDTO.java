@@ -15,7 +15,7 @@ public class ApprovalDTO implements Serializable {
     private Long userID;
     private String review;
     private Long idMaintence;
-    private Integer status;//0: decline, 1: in process, 2 approval
+    private Integer status;//0: decline, 1: in process 2: approval, 3: RQUD
 
     //=========field for approval b2
     private Long totalMoney;

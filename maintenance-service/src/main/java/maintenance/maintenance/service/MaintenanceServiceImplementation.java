@@ -27,7 +27,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
 //    private BookingServiceImplementation bookingServiceImplementation;
 
     @Override
-    public Maintenance convertDTOToModelCreated(MaintenanceDTO dto) throws Exception{
+    public Maintenance convertDTOToModelCreated(MaintenanceDTO dto, Integer type) throws Exception{
         Maintenance maintenance = new Maintenance();
 
         maintenance.setName(dto.getName());
@@ -39,8 +39,15 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         maintenance.setRound(1);
 
         maintenance.setImageBefore(dto.getImageFile().getBytes());
-        maintenance.setContractId(dto.getContractID());
-        createApprovalByStep(maintenance);
+        maintenance.setRoomID(dto.getRoomID());
+
+
+        maintenance= maintenanceRepository.save(maintenance);
+        createApprovaStepCreated(maintenance, dto.getIdCreator());
+        if(type == 0) {
+            createApprovalByStep(maintenance);
+        }
+
 
         return maintenance;
     }
@@ -78,11 +85,11 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
                     //0: cancel, 1 in process, 2: Declined, 3: Request Update , 4: completed
                     break;*/
                     case 2:
+
+                        maintenance.setTotalMoney(dto.getTotalMoney());
+                        approval.setImageEnd(dto.getImageFile().getBytes());
                         maintenance.setStep(3);
                         createApprovalByStep(maintenance);
-                        maintenance.setTotalMoney(dto.getTotalMoney());
-
-                        approval.setImageEnd(dto.getImageFile().getBytes());
                         break;
                     case 3:
                         maintenance.setStatus(3);
@@ -101,10 +108,10 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
                 }
             }
 
-            maintenanceRepository.save(maintenance);
             approvalService.save(approval);
 
-            return getMaintenanceById(dto.getIdMaintence());
+
+            return maintenanceRepository.save(maintenance);
         }
         catch (NullPointerException nullPointerException){
             System.err.println(nullPointerException.getMessage());
@@ -116,6 +123,9 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
     public String cancelMaintenance(Long id) throws Exception {
         try{
             Maintenance maintenance = getMaintenanceById(id);
+            if(maintenance.getStep() != 1){
+                return "Can't cancel maintenance " + id + " because wrong status";
+            }
             maintenance.setStatus(0);
 
             maintenanceRepository.save(maintenance);
@@ -153,7 +163,20 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         approvalService.save(approval);
     }
 
-    public void createApproval(Maintenance maintenance) throws Exception {
+    public void createApprovaStepCreated(Maintenance maintenance, Long idCreator) throws Exception{
+        Approval approval = new Approval();
+        approval.setRound(1);
+        approval.setStep(0);
+        approval.setApprovalAt(LocalDateTime.now());
+        approval.setReview("Created");
+        approval.setHandlerID(idCreator);
+        approval.setMaintenance(maintenance);
+        approval.setStatus(1);
+
+        approvalService.save(approval);
+    }
+
+    public void createApproval(Maintenance maintenance, Long idCreator) throws Exception {
         for(int i =1; i< 3;i++){
             Approval approval =  new Approval();
             approval.setStep(i);
@@ -168,7 +191,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         approval.setMaintenance(maintenance);
         approval.setRound(maintenance.getRound());
         approval.setStatus(1);
-        approval.setHandlerID(contractServiceImplementation.getContractById(maintenance.getContractId()).getBody().getBooking().getUserId());
+        approval.setHandlerID(idCreator);
         approvalService.save(approval);
     }
 
@@ -183,21 +206,21 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         maintenance.setStatus(1);
         maintenance.setModifyAt(LocalDateTime.now());
         maintenance.setImageBefore(dto.getImageFile().getBytes());
-        maintenance.setContractId(dto.getContractID());
+        maintenance.setRoomID(dto.getRoomID());
     }
 
     @Override
-    public Maintenance createMaintenance(MaintenanceDTO maintenanceDTO) throws Exception {
-        Maintenance maintenance = convertDTOToModelCreated(maintenanceDTO);
-        maintenance = maintenanceRepository.save(maintenance);
+    public Maintenance createMaintenanceUser(MaintenanceDTO maintenanceDTO, Integer type) throws Exception {
+        Maintenance maintenance = convertDTOToModelCreated(maintenanceDTO, type);
         return maintenance;
     }
+
 
     @Override
     public String resubmitMaintenance(MaintenanceDTO dto, Long id) throws Exception {
         try {
             Maintenance maintenance = getMaintenanceById(id);
-            if (maintenance.getStatus() != 5) {
+            if (maintenance.getStatus() != 3 && maintenance.getStatus() != 0) {
                 return "Wrong status";
             }
 
@@ -210,7 +233,35 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
             maintenance.setRound(maintenance.getRound() + 1);
 
             maintenance.setImageBefore(dto.getImageFile().getBytes());
+
+            maintenanceRepository.save(maintenance);
+
+            return "Resubmit successfully";
+        }
+        catch (NullPointerException nullPointerException){
+            System.err.println(nullPointerException.getMessage());
+            throw nullPointerException;
+        }
+    }
+
+    @Override
+    public String updateMaintenance(MaintenanceDTO dto, Long id) throws Exception {
+        try {
+            Maintenance maintenance = getMaintenanceById(id);
+            if (maintenance.getStep() != 1) {
+                return "Wrong step";
+            }
+
+            maintenance.setName(dto.getName());
+            maintenance.setDescription(dto.getDescription());
+            maintenance.setStatus(1);
+            maintenance.setStep(1);
             createApprovalByStep(maintenance);
+            maintenance.setModifyAt(null);
+            maintenance.setRound(maintenance.getRound() + 1);
+
+            maintenance.setImageBefore(dto.getImageFile().getBytes());
+
             maintenanceRepository.save(maintenance);
 
             return "Resubmit successfully";
@@ -223,9 +274,9 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
 
 
     @Override
-    public Page<Maintenance> getAllMaintenance(int page, int size) throws Exception {
-        Pageable pageable = PageRequest.of(page,size);
-        return maintenanceRepository.findAll(pageable);
+    public List<Maintenance> getAllMaintenance() throws Exception {
+        //Pageable pageable = PageRequest.of(page,size);
+        return maintenanceRepository.findAll();
     }
 
 
@@ -257,34 +308,34 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
     }
 
     @Override
-    public Page<Maintenance> getMaintenanceByContract(Long id, Integer page, Integer size) throws Exception {
-        Pageable pageable = PageRequest.of(page,size);
-        return maintenanceRepository.findByContractId(id,pageable);
+    public List<Maintenance> getMaintenanceByContract(Long id) throws Exception {
+        //Pageable pageable = PageRequest.of(page,size);
+        return maintenanceRepository.findByRoomID(id);
     }
 
     @Override
-    public Page<Maintenance> getMaintenanceByStatus(Integer status, Integer page, Integer size) throws Exception {
-        Pageable pageable = PageRequest.of(page,size);
-        return maintenanceRepository.findByStatus(status, pageable);
+    public List<Maintenance> getMaintenanceByStatus(Integer status) throws Exception {
+        //Pageable pageable = PageRequest.of(page,size);
+        return maintenanceRepository.findByStatus(status);
     }
 
     @Override
-    public Page<Maintenance> getMaintenanceByTime(LocalDateTime start, LocalDateTime end, Pageable pageable) throws Exception {
-        List<Maintenance> maintenanceList = maintenanceRepository.FindDateBetween(start, end);
+    public List<Maintenance> getMaintenanceByTime(LocalDateTime start, LocalDateTime end) throws Exception {
+        return maintenanceRepository.FindDateBetween(start, end);
+       // List<Maintenance> maintenanceList = maintenanceRepository.FindDateBetween(start, end);
 
-        int startPos = (int) pageable.getOffset();
+        /*int startPos = (int) pageable.getOffset();
         int endPos = Math.min(startPos + pageable.getPageSize(), maintenanceList.size());
 
-        List<Maintenance> splitList = maintenanceList.subList(startPos,endPos);
+        List<Maintenance> splitList = maintenanceList.subList(startPos,endPos);*/
 
-        return new PageImpl<>(splitList, pageable, maintenanceList.size());
+        //return new PageImpl<>(splitList, pageable, maintenanceList.size());
+
     }
 
     @Override
     public List<Maintenance> getMaintenanceByHandler(Long userID) throws Exception {
         return null;
     }
-
-
 
 }

@@ -11,8 +11,9 @@ import java.io.Serializable;
 @Setter
 @Getter
 public class MaintenanceDTO implements Serializable {
+    private Long idCreator;
     private String name;
     private String description;
-    private Long contractID;
+    private Long roomID;
     private MultipartFile imageFile;
 }

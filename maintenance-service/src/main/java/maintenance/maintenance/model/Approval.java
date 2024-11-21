@@ -24,7 +24,7 @@ public class Approval {
     private String review;
     private Long handlerID;
     private Integer status;
-    //0: decline, 1: in process, 2 approval
+    //0: decline, 1: in process 2: approval, 3: RQUD
     @Lob
     @Column(name = "imageEnd", columnDefinition = "LONGBLOB")
     private byte[] imageEnd;
