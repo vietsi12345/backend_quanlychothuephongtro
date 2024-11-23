@@ -45,5 +45,7 @@ public interface MaintenanceService {
 
     void convertDTOToModelUpdate(MaintenanceDTO dto, Maintenance maintenance) throws Exception;
 
+    String deletMaintenance(Long id) throws Exception;
+
     String updateMaintenance(MaintenanceDTO dto, Long id) throws Exception;
 }

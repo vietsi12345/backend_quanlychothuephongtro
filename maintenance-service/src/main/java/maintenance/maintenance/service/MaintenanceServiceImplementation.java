@@ -32,20 +32,22 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
 
         maintenance.setName(dto.getName());
         maintenance.setDescription(dto.getDescription());
-        maintenance.setStatus(1);
         maintenance.setStep(1);
         maintenance.setCreateAt(LocalDateTime.now());
         maintenance.setModifyAt(null);
         maintenance.setRound(1);
-
         maintenance.setImageBefore(dto.getImageFile().getBytes());
         maintenance.setRoomID(dto.getRoomID());
-
+        maintenance.setType(type);
 
         maintenance= maintenanceRepository.save(maintenance);
         createApprovaStepCreated(maintenance, dto.getIdCreator());
-        if(type == 0) {
+
+        if(type == 0) {//0: user, 1: admin
             createApprovalByStep(maintenance);
+            maintenance.setStatus(1);
+        }else{
+            maintenance.setStatus(4);
         }
 
 
@@ -210,7 +212,20 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
     }
 
     @Override
-    public Maintenance createMaintenanceUser(MaintenanceDTO maintenanceDTO, Integer type) throws Exception {
+    public String deletMaintenance(Long id) throws Exception {
+        try {
+            approvalService.deleteByMaintenance(getMaintenanceById(id));
+            maintenanceRepository.deleteById(id);
+            
+            return "Delete maintenance "+ id + " successfully";
+        }catch (NullPointerException nullPointerException){
+            System.err.println("Error delete maintenance");
+            throw nullPointerException;
+        }
+    }
+
+    @Override
+    public Maintenance createMaintenanceUser(MaintenanceDTO maintenanceDTO, Integer type) throws Exception {//0: user, 1: admin
         Maintenance maintenance = convertDTOToModelCreated(maintenanceDTO, type);
         return maintenance;
     }
@@ -248,7 +263,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
     public String updateMaintenance(MaintenanceDTO dto, Long id) throws Exception {
         try {
             Maintenance maintenance = getMaintenanceById(id);
-            if (maintenance.getStep() != 1) {
+            if (maintenance.getStep() != 1 && maintenance.getType() == 0) {
                 return "Wrong step";
             }
 
@@ -259,8 +274,12 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
             createApprovalByStep(maintenance);
             maintenance.setModifyAt(null);
             maintenance.setRound(maintenance.getRound() + 1);
+            maintenance.setModifyAt(LocalDateTime.now());
 
             maintenance.setImageBefore(dto.getImageFile().getBytes());
+            if(maintenance.getType() == 1){
+                maintenance.setTotalMoney(dto.getTotalMoney());
+            }
 
             maintenanceRepository.save(maintenance);
 
@@ -278,8 +297,6 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         //Pageable pageable = PageRequest.of(page,size);
         return maintenanceRepository.findAll();
     }
-
-
 
     @Override
     public Maintenance getMaintenanceById(Long id) throws Exception {

@@ -18,4 +18,6 @@ public interface ApprovalService {
     public List<Approval> findByMaintenance(Maintenance maintenance) throws Exception;
 
     public Approval findCurrentApprovalMaintenance(Long maintenanceID) throws Exception;
+
+    public void deleteByMaintenance(Maintenance maintenanceID) throws Exception;
 }

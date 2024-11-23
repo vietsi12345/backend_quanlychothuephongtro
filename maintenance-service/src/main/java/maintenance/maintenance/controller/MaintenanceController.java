@@ -23,6 +23,11 @@ public class MaintenanceController {
     @Autowired
     private MaintenanceServiceImplementation maintenanceServiceImplementation;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Maintenance> getMaintenanceByID(@PathVariable Long id) throws Exception{
+        return ResponseEntity.ok(maintenanceServiceImplementation.getMaintenanceById(id));
+    }
+
     @GetMapping("/cancel/{id}")
     public ResponseEntity<String> cancelMaintenance(@PathVariable Long id) throws Exception{
         try {
@@ -33,24 +38,12 @@ public class MaintenanceController {
         }
     }
 
-    @GetMapping("/getByContract")
-    public ResponseEntity<List<Maintenance>> getByContract(@RequestParam Long id)throws Exception{
-
-        return ResponseEntity.ok(maintenanceServiceImplementation.getMaintenanceByContract(id));
-    }
-
     @GetMapping("/getByStatus")
     public ResponseEntity<List<Maintenance>> getByStatus(@RequestParam Integer status, @RequestParam Integer page)throws Exception{
 
         return ResponseEntity.ok(maintenanceServiceImplementation.getMaintenanceByStatus(status));
     }
 
-
-
-    @GetMapping("/all")
-    public ResponseEntity<List<Maintenance>> getAllMaintenance() throws  Exception{
-        return ResponseEntity.ok(maintenanceServiceImplementation.getAllMaintenance());
-    }
 
     @PostMapping("/")
     public ResponseEntity<?> createMaintenance(@ModelAttribute MaintenanceDTO maintenanceDTO) throws Exception{
@@ -70,7 +63,7 @@ public class MaintenanceController {
     @PutMapping("/{id}")
     public ResponseEntity<String> updateMaintenance(@ModelAttribute MaintenanceDTO maintenanceDTO, @PathVariable Long id) throws Exception{
         try {
-            return ResponseEntity.ok(maintenanceServiceImplementation.resubmitMaintenance(maintenanceDTO, id));
+            return ResponseEntity.ok(maintenanceServiceImplementation.updateMaintenance(maintenanceDTO, id));
         }catch (NullPointerException nullPointerException){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Maintenance "+ id+" is not present");
         }
@@ -86,8 +79,13 @@ public class MaintenanceController {
         }
     }
 
-    @PostMapping("/admin")
-    public ResponseEntity<Maintenance> createMaintenanceAdmin(@ModelAttribute MaintenanceDTO maintenanceDTO) throws  Exception{
-        return null;
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteMaintenanceByID(@PathVariable Long id) throws Exception{
+        try {
+            return ResponseEntity.ok(maintenanceServiceImplementation.deletMaintenance(id));
+        }catch (NullPointerException nullPointerException){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Maintenance "+ id + " is not present");
+        }
+
     }
 }

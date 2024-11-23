@@ -16,4 +16,5 @@ public class MaintenanceDTO implements Serializable {
     private String description;
     private Long roomID;
     private MultipartFile imageFile;
+    private Long totalMoney;
 }

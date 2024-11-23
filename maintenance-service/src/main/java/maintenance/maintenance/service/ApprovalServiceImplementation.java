@@ -30,8 +30,6 @@ public class ApprovalServiceImplementation implements ApprovalService {
         return approval;
     }
 
-
-
     @Override
     public ApprovalDTO convertModelToDTO(Approval approval) {
         ApprovalDTO dto = new ApprovalDTO();
@@ -77,5 +75,13 @@ public class ApprovalServiceImplementation implements ApprovalService {
         }
 
         return null;
+    }
+
+    @Override
+    public void deleteByMaintenance(Maintenance maintenanceID) throws Exception {
+        List<Approval> maintenancs = findByMaintenance(maintenanceID);
+        for(Approval app:maintenancs){
+            approvalRepository.delete(app);
+        }
     }
 }

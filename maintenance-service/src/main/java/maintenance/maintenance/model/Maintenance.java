@@ -26,6 +26,7 @@ public class Maintenance {
     private String name;
     private String description;
     private Integer status;
+    private Integer type;//0: user, 1: admin
     //0: cancel, 1 in process, 2: Declined, 3: Request Update , 4: completed
     private Integer step;//1, 2, 3
     private LocalDateTime createAt;
