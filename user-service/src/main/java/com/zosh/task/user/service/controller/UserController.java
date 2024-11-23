@@ -62,8 +62,9 @@ public class UserController {
     }
 
     @PutMapping("/cancel/{id}")
-    public ResponseEntity<User> cancelUser (@PathVariable Long id) throws Exception {
-        User user = userService.cancelUser(id);
+    public ResponseEntity<User> updateStatusUser (@PathVariable Long id,
+                                                  @RequestParam ("status") String status) throws Exception {
+        User user = userService.updateStatuslUser(id,status);
         return ResponseEntity.ok(user);
     }
     @PostMapping

@@ -48,9 +48,13 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
-    public User cancelUser(Long id) throws Exception {
+    public User updateStatuslUser(Long id, String status) throws Exception {
         User user = getUserById(id);
-        user.setIsActive(false);
+        if (status.equals("lock")) {
+            user.setIsActive(false);
+        } else {
+            user.setIsActive(true);
+        }
         return userRepository.save(user);
     }
 

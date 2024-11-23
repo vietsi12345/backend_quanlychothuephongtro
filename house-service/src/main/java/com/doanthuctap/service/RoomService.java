@@ -26,4 +26,7 @@ public interface RoomService {
     Room updateStatus (Long id, RoomStatus status) throws Exception;
 
     List<Room> getRoomsByHouseIdForAdmin (Long houseId) throws  Exception;
+
+    // lấy thời gian còn lại của hợp đồng
+    Integer getExistContractOfRoom (Long roomId) throws Exception;
 }

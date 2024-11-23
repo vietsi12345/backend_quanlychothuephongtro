@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface RoomRepository extends JpaRepository <Room,Long>{
-    @Query("SELECT MIN(r.price) FROM Room r WHERE r.house.id = :houseId")
+    @Query("SELECT MIN(r.price) FROM Room r WHERE r.house.id = :houseId AND r.status != 'DELETED'")
     BigDecimal findMinPriceByHouseId(@Param("houseId") Long houseId);
 
     // Lấy tất cả các phòng mà không bao gồm những phòng có trạng thái là DELETED
