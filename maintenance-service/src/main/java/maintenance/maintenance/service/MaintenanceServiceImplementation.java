@@ -40,7 +40,6 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         maintenance.setRoomID(dto.getRoomID());
         maintenance.setType(type);
 
-        maintenance= maintenanceRepository.save(maintenance);
         createApprovaStepCreated(maintenance, dto.getIdCreator());
 
         if(type == 0) {//0: user, 1: admin
@@ -50,6 +49,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
             maintenance.setStatus(4);
         }
 
+        maintenance= maintenanceRepository.save(maintenance);
 
         return maintenance;
     }
@@ -68,7 +68,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
             if (maintenance.getStep() == 1) {
                 switch (dto.getStatus()) {//0: decline, 1: in process 2: approval, 3: RQUD
                     case 0:
-                        maintenance.setStatus(4);
+                        maintenance.setStatus(2);
                         //0: cancel, 1 in process, 2: Declined, 3: Request Update , 4: completed
                         break;
                     case 2:
@@ -78,16 +78,14 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
                     case 3:
                         maintenance.setStatus(3);
                         break;
-
                 }
             } else if (maintenance.getStep() == 2) {
-                switch (dto.getStatus()) {///0: decline, 1: in process 2: approval, 3: RQUD, 4: cancel
+                switch (dto.getStatus()) {///0: decline, 1: in process 2: approval, 3: RQUD
                 /*case 0:
                     maintenance.setStatus(2);
                     //0: cancel, 1 in process, 2: Declined, 3: Request Update , 4: completed
                     break;*/
                     case 2:
-
                         maintenance.setTotalMoney(dto.getTotalMoney());
                         approval.setImageEnd(dto.getImageFile().getBytes());
                         maintenance.setStep(3);
@@ -106,6 +104,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
                     case 3:
                         maintenance.setStep(1);
                         createApprovalByStep(maintenance);
+                        maintenance.setRound(maintenance.getRound() + 1);
                         break;
                 }
             }
@@ -159,7 +158,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         Approval approval = new Approval();
         approval.setStep(maintenance.getStep());
         approval.setMaintenance(maintenance);
-        approval.setStatus(1);
+        approval.setStatus(1); // in process
         approval.setRound(maintenance.getRound());
 
         approvalService.save(approval);

@@ -97,7 +97,7 @@ public class ContractController {
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<Contract>> getContractForUser (@PathVariable Long id) {
+    public ResponseEntity<List<ContractResponse>> getContractForUser (@PathVariable Long id) throws Exception {
         return ResponseEntity.ok(contractService.getContractForUser(id));
     }
 }
