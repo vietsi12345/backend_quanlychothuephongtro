@@ -49,7 +49,27 @@ public class    BookingController {
             return ResponseEntity.status(226).body("Phòng này đang bảo trì!!");
         }
         else {
-            return ResponseEntity.status(226).body("Phòng này đã được thuê");
+            Integer remainingContract = bookingService.getRemainingContractOfRoom(booking.getRoomId());
+            if (remainingContract >= 0 && remainingContract <= 14) {
+                Booking pendingBooking = bookingRepository.findByUserIdAndRoomIdAndStatus(
+                        booking.getUserId(), booking.getRoomId(), "ĐANG CHỜ DUYỆT"
+                );
+                if (pendingBooking != null ) {
+                    return ResponseEntity.status(226).body("Bạn đã đặt phòng này rồi, đơn của bạn đang được giải quyết !!");
+                }
+                else {
+                    Booking createBooking = bookingService.createBooking(booking);
+                    return ResponseEntity.ok(createBooking);
+                }
+            }
+            // Không cho thuê nếu còn nhiều hơn 2 tuần
+            if (remainingContract > 14) {
+                return ResponseEntity.status(226).body("Phòng này đã được thuê");
+            }
+            else { // trường hợp -1 tức là đơn đặt phòng này chưa kịp tạo hợp đồng
+                return ResponseEntity.status(226).body("Phòng này đã có người đặt thành công rồi !!");
+            }
+            // hết trường hợp vì còn trường hợp -2 tức là phòng trống, -3 tức là hợp đồng đã chấm dứt => phòng trống
         }
     }
 
@@ -82,6 +102,12 @@ public class    BookingController {
         List<Booking> bookings = bookingService.findApprovedBookingsWithoutContract();
         return ResponseEntity.ok(bookings);
     }
+    @GetMapping ("/remaining-contract-by-room/{roomId}")
+    public ResponseEntity <?> getRemainingContractByRoom (@PathVariable Long roomId) throws  Exception {
+        Integer remaining = bookingService.getRemainingContractOfRoom(roomId);
+        return ResponseEntity.ok(remaining);
+    }
+
 
     @PostMapping("/update-status/{id}")
     public ResponseEntity <?> updateBookingStatus (
@@ -93,6 +119,14 @@ public class    BookingController {
             return ResponseEntity.status(226).body("Phiếu đặt này đã hủy rồi!!!");
         }  else if (bookingOld.getStatus().equals("Đang chờ duyệt")) {
             if (status.equals("Đã duyệt")) { // trường hợp từ đang chờ duyệt thành đã duyệt
+                // kiểm tra xem đã có đơn đặt phòng nào của phòng này đã được duyệt chưa => tức là đã có hợp đồng rồi
+                // => đơn đặt phòng hiện tại này đang là đơn đặt phòng trước
+                List<Booking> bookingsExist  = bookingRepository.findByRoomIdAndStatus(bookingOld.getRoomId(), "Đã duyệt");
+                if (bookingsExist != null && !bookingsExist.isEmpty()) {
+                    return ResponseEntity.status (226).body("Đây là đơn đặt phòng trước!! Vui lòng đợi hợp đồng (Đơn đặt phòng "
+                            +bookingsExist.get(0).getId() + " ) hiện tại kết thúc !!");
+                }
+                // ** trước hợp bình thường không phải đơn đătj phòng trước
                 // duyệt đơn đặt phòng
                 Booking booking = bookingService.updateBookingStatus(id,status);
                 // gửi thông báo thành công đến khách hàng

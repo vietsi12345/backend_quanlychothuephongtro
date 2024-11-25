@@ -22,4 +22,6 @@ public interface BookingService {
     List <Booking> findApprovedBookingsWithoutContract();
 
     String generateConfirmationCode();
+
+    Integer getRemainingContractOfRoom (Long roomId) throws Exception;
 }

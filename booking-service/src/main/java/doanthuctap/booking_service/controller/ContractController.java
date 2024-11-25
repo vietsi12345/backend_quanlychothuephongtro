@@ -67,7 +67,8 @@ public class ContractController {
     public ResponseEntity<Contract> updateContractStatus (@PathVariable Long id) throws  Exception {
         Contract contract =  contractService.updateStatusContract(id);
         // cập nhật lại trạng thái phiếu đặt
-        bookingController.updateBookingStatus(contract.getBooking().getId(),"Đã hủy");
+        contract.getBooking().setStatus("Đã hủy");
+        bookingRepository.save(contract.getBooking());
         // cập nhật lại trạng thái phòng thành "AVAILABLE"
         RoomDto room = roomService.updateStatus(contract.getBooking().getRoomId(),"AVAILABLE");
         // gửi thông báo tạo chấm dứt hợp đồng  tới user

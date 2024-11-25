@@ -14,6 +14,6 @@ public interface UserService {
 
     List <User> GetAllStaffOrCustomer(String role);
 
-    User cancelUser (Long id) throws Exception;
+    User updateStatuslUser (Long id, String status) throws Exception;
     User addUser (User user) ;
 }

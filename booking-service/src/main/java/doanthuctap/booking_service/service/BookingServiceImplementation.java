@@ -1,6 +1,7 @@
 package doanthuctap.booking_service.service;
 
 import doanthuctap.booking_service.model.Booking;
+import doanthuctap.booking_service.model.Contract;
 import doanthuctap.booking_service.model.NotificationDto;
 import doanthuctap.booking_service.model.RoomDto;
 import doanthuctap.booking_service.repository.BookingRepository;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -90,4 +92,34 @@ public String generateConfirmationCode() {
 
     return String.valueOf(confirmationCode);
 }
+
+    @Override
+    public Integer getRemainingContractOfRoom(Long roomId) throws Exception {
+        // Tìm booking theo roomId và status đã duyệt
+        List <Booking> bookings = bookingRepository.findByRoomIdAndStatus(roomId, "đã duyệt");
+        // Kiểm tra danh sách rỗng
+        if (bookings == null || bookings.isEmpty()) {
+            return -2; // phòng đang trống
+        }
+        // Lấy booking đầu tiên vì chỉ có 1 bookings duy nhất nếu có
+        Booking booking = bookings.get(0);
+        Contract contract = booking.getContract();
+        // Kiểm tra contract
+        if (contract == null) { // đã có người đặt rồi nhưng chưa đc tạo hợp đồng
+            return -1;
+        }
+        LocalDate currentDate = LocalDate.now();
+        LocalDate endDate = contract.getEndDate();
+        // Nếu hợp đồng đã hết hạn
+//        if (currentDate.isAfter(endDate)) {
+//            return -1;
+//        }
+        // nếu hợp đồng đã chấm dứt
+        if (contract.getStatus().equals("Đã chấm dứt")) {
+            return -3;
+        }
+        // Tính số ngày còn lại
+        int daysRemaining = (int) ChronoUnit.DAYS.between(currentDate, endDate);
+        return daysRemaining;
+    }
 }

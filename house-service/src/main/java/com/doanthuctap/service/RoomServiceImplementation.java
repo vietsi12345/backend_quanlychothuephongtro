@@ -90,4 +90,13 @@ public class RoomServiceImplementation implements RoomService{
     public List<Room> getRoomsByHouseIdForAdmin(Long houseId) throws Exception {
         return roomRepository.findByHouseId(houseId);
     }
+
+    @Override
+    public Integer getExistContractOfRoom(Long roomId) throws Exception {
+        Room room = getRoomById(roomId);
+        if (room.getStatus().equals(RoomStatus.RENTED)){
+            return null;
+        } else return null;
+
+    }
 }
