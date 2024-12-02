@@ -98,6 +98,5 @@ public class MaintenanceController {
         }catch (NullPointerException nullPointerException){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Maintenance "+ id + " is not present");
         }
-
     }
 }

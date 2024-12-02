@@ -73,8 +73,16 @@ public class ContractServiceImplementation implements ContractService {
     }
 
     @Override
-    public List<Contract> getContractForUser(Long userId) {
-        return contractRepository.findByBookingUserIdOrderByIdDesc(userId);
+    public List<ContractResponse> getContractForUser(Long userId) throws Exception {
+        List<Contract> contracts = contractRepository.findByBookingUserIdOrderByIdDesc(userId); // Lấy tất cả các hợp đồng của user
+        List<ContractResponse> contractResponses = new ArrayList<>(); // Khởi tạo danh sách ContractResponse
+
+        for (Contract contract : contracts) {
+            ContractResponse contractResponse = convertContractResponse(contract); // Chuyển đổi Contract thành ContractResponse
+            contractResponses.add(contractResponse); // Thêm vào danh sách ContractResponse
+        }
+
+        return contractResponses; // Trả về danh sách ContractResponse
     }
 
     @Override

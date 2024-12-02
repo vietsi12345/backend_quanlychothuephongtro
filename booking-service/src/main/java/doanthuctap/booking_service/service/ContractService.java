@@ -18,7 +18,7 @@ public interface ContractService {
 
     Contract updateStatusContract (Long id) throws Exception;
 
-    List<Contract> getContractForUser (Long userId) ;
+    List<ContractResponse> getContractForUser (Long userId) throws Exception;
 
     ContractResponse convertContractResponse (Contract contract) throws Exception;
 }
