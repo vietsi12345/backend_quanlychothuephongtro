@@ -28,18 +28,18 @@ public class Maintenance {
     private Integer status;
     private Integer type;//0: user, 1: admin
     //0: cancel, 1 in process, 2: Declined, 3: Request Update , 4: completed
-    private Integer step;//1, 2, 3
-    private LocalDateTime createAt;
+    // private Integer step;//1, 2, 3
+    //private LocalDateTime createAt;
     private LocalDateTime modifyAt;//tgian cancel
     private Long totalMoney;
     //private LocalDateTime approvalAt;
     //private LocalDateTime doneAt;
-    private Integer Round; // so vong bao tri
+    // private Integer Round; // so vong bao tri
     //private Long handlerID;
 
-    @Lob
-    @Column(name = "imageBefore", columnDefinition = "LONGBLOB")
-    private byte[] imageBefore;
+//    @Lob
+//    @Column(name = "imageBefore", columnDefinition = "LONGBLOB")
+//    private byte[] imageBefore;
 
 //    @ManyToOne
 //    @JoinColumn(name = "contractId", nullable = false)

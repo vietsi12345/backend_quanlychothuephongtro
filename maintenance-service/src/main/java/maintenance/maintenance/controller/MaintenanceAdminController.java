@@ -1,11 +1,11 @@
 package maintenance.maintenance.controller;
 
+import maintenance.maintenance.exeption.InvalidMaintenanceStatusException;
+import maintenance.maintenance.model.ApprovalDTO;
 import maintenance.maintenance.model.Maintenance;
 import maintenance.maintenance.model.MaintenanceDTO;
 import maintenance.maintenance.service.MaintenanceServiceImplementation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,17 +43,32 @@ public class MaintenanceAdminController {
 
     //chua test
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateMaintenance(@ModelAttribute MaintenanceDTO maintenanceDTO, @PathVariable Long id) throws Exception{
+    public ResponseEntity<Maintenance> updateMaintenance(@ModelAttribute MaintenanceDTO maintenanceDTO, @PathVariable Long id) throws Exception{
         try {
             return ResponseEntity.ok(maintenanceServiceImplementation.updateMaintenance(maintenanceDTO, id));
         }catch (NullPointerException nullPointerException){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Maintenance "+ id+" is not present");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        catch (InvalidMaintenanceStatusException invalidMaintenanceStatusException){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Maintenance> getMaintenanceByID(@PathVariable Long id) throws Exception{
         return ResponseEntity.ok(maintenanceServiceImplementation.getMaintenanceById(id));
+    }
+
+    @PutMapping("/approval")
+    public ResponseEntity<Maintenance> approvalMaintenanceStep1(@ModelAttribute ApprovalDTO approvalDTO) throws Exception{
+        // Duyet o day
+        try {
+            return ResponseEntity.ok(maintenanceServiceImplementation.ApprovalMaintenance(approvalDTO));
+        }catch (NullPointerException nullPointerException){
+            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }catch (InvalidMaintenanceStatusException invalidMaintenanceStatusException){
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
     @DeleteMapping("/{id}")

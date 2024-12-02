@@ -3,8 +3,6 @@ package maintenance.maintenance.service;
 import maintenance.maintenance.model.ApprovalDTO;
 import maintenance.maintenance.model.Maintenance;
 import maintenance.maintenance.model.MaintenanceDTO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
@@ -16,14 +14,17 @@ public interface MaintenanceService {
 
     Maintenance createMaintenanceUser(MaintenanceDTO maintenanceDTO, Integer type) throws Exception;
 
-    String resubmitMaintenance(MaintenanceDTO dto, Long id) throws  Exception;
+    Maintenance resubmitMaintenance(MaintenanceDTO dto, Long id) throws  Exception;
 
     List<Maintenance> getAllMaintenance() throws  Exception;
 
+    Integer getRound(Long idMaintenance) throws Exception;
+
+    Integer getStep(Long idMaintenance) throws Exception;
 
     Maintenance getMaintenanceById (Long id) throws  Exception;
 
-    Maintenance updateMaintenance(MultipartFile imageFile, MaintenanceDTO maintenanceDTO, Long id) throws  Exception;
+    //Maintenance updateMaintenance(MultipartFile imageFile, MaintenanceDTO maintenanceDTO, Long id) throws  Exception;
 
     Maintenance changeStatusMaintenance(Long id, Integer status) throws  Exception;
 
@@ -39,13 +40,13 @@ public interface MaintenanceService {
 
     Maintenance ApprovalMaintenance(ApprovalDTO dto) throws Exception;
 
-    String cancelMaintenance(Long id) throws  Exception;
+    Maintenance cancelMaintenance(Long id) throws  Exception;
 
-    String updateMaintenance(Long id, MaintenanceDTO maintenanceDTO) throws Exception;
+    //Maintenance updateMaintenance(Long id, MaintenanceDTO maintenanceDTO) throws Exception;
 
-    void convertDTOToModelUpdate(MaintenanceDTO dto, Maintenance maintenance) throws Exception;
+    //void convertDTOToModelUpdate(MaintenanceDTO dto, Maintenance maintenance) throws Exception;
 
     String deletMaintenance(Long id) throws Exception;
 
-    String updateMaintenance(MaintenanceDTO dto, Long id) throws Exception;
+    Maintenance updateMaintenance(MaintenanceDTO maintenanceDTO, Long id) throws Exception;
 }

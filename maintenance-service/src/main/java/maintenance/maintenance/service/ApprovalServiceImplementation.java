@@ -62,19 +62,42 @@ public class ApprovalServiceImplementation implements ApprovalService {
         return approvalRepository.save(approval);
     }
 
+    public Long getHandlerId(Long maintenanceId) {
+        return approvalRepository.findHandlerIdByStepAndRound(maintenanceId);
+    }
+
+    public Approval getApprovalStep0(Long maintenanceID, Integer round) throws Exception{
+        return approvalRepository.getApprovalStep0(maintenanceID, round);
+    }
+
     @Override
     public Approval findCurrentApprovalMaintenance(Long maintenanceID) throws Exception {
         if(maintenanceRepository.findById(maintenanceID).isPresent()){
             Maintenance maintenance = maintenanceRepository.findById(maintenanceID).get();
             List<Approval> approvals = findByMaintenance(maintenance);
             for(Approval app : approvals){
-                if(Objects.equals(app.getStep(), maintenance.getStep())){
+                if(Objects.equals(app.getStep(), findStep(maintenance.getID()))){
                     return app;
                 }
             }
         }
 
         return null;
+    }
+
+    public Integer findStep(Long maintenanceID) throws Exception{
+        Integer maxRound = approvalRepository.findMaxRoundByMaintenanceId(maintenanceID);
+
+        // Nếu có round, tìm step lớn nhất trong round đó
+        if (maxRound != null) {
+            return approvalRepository.findMaxStepByMaintenanceIdAndRound(maintenanceID, maxRound);
+        }
+
+        return null; // Trả về null nếu không tìm thấy round nào
+    }
+
+    public Integer findRound(Long maintenanceID) throws Exception{
+        return approvalRepository.findMaxRoundByMaintenanceId(maintenanceID);
     }
 
     @Override

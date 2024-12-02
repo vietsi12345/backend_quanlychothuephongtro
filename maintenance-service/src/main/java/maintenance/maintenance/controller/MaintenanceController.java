@@ -1,6 +1,7 @@
 package maintenance.maintenance.controller;
 
 
+import maintenance.maintenance.exeption.InvalidMaintenanceStatusException;
 import maintenance.maintenance.model.ApprovalDTO;
 import maintenance.maintenance.model.Maintenance;
 import maintenance.maintenance.model.MaintenanceDTO;
@@ -29,12 +30,15 @@ public class MaintenanceController {
     }
 
     @GetMapping("/cancel/{id}")
-    public ResponseEntity<String> cancelMaintenance(@PathVariable Long id) throws Exception{
+    public ResponseEntity<Maintenance> cancelMaintenance(@PathVariable Long id) throws Exception{
         try {
             return ResponseEntity.ok(maintenanceServiceImplementation.cancelMaintenance(id));
         }
         catch (NullPointerException nullPointerException){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found maintenance " + id + "  to cancel");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        catch (InvalidMaintenanceStatusException invalidMaintenanceStatusException){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -51,31 +55,39 @@ public class MaintenanceController {
     }
 
     @PutMapping("/resubmit/{id}")
-    public ResponseEntity<String> resubmitMaintenance(@ModelAttribute MaintenanceDTO maintenanceDTO, @PathVariable Long id) throws Exception{
+    public ResponseEntity<Maintenance> resubmitMaintenance(@ModelAttribute MaintenanceDTO maintenanceDTO, @PathVariable Long id) throws Exception{
         try {
             return ResponseEntity.ok(maintenanceServiceImplementation.resubmitMaintenance(maintenanceDTO,id));
         }catch (NullPointerException nullPointerException){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Maintenance "+id+" is not present");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        catch (InvalidMaintenanceStatusException invalidMaintenanceStatusException){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
     //chua sua
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateMaintenance(@ModelAttribute MaintenanceDTO maintenanceDTO, @PathVariable Long id) throws Exception{
+    public ResponseEntity<Maintenance> updateMaintenance(@ModelAttribute MaintenanceDTO maintenanceDTO, @PathVariable Long id) throws Exception{
         try {
             return ResponseEntity.ok(maintenanceServiceImplementation.updateMaintenance(maintenanceDTO, id));
         }catch (NullPointerException nullPointerException){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Maintenance "+ id+" is not present");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        catch (InvalidMaintenanceStatusException invalidMaintenanceStatusException){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
     @PutMapping("/approval")
-    public ResponseEntity<?> approvalMaintenanceStep1(@ModelAttribute ApprovalDTO approvalDTO) throws Exception{
+    public ResponseEntity<Maintenance> approvalMaintenanceStep1(@ModelAttribute ApprovalDTO approvalDTO) throws Exception{
         // Duyet o day
         try {
             return ResponseEntity.ok(maintenanceServiceImplementation.ApprovalMaintenance(approvalDTO));
         }catch (NullPointerException nullPointerException){
-            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body("Maintenance "+approvalDTO.getIdMaintence() +" is not present");
+            return  ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }catch (InvalidMaintenanceStatusException invalidMaintenanceStatusException){
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
