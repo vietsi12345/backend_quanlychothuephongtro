@@ -37,7 +37,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         //maintenance.setImageBefore(dto.getImageFile().getBytes());
         maintenance.setRoomID(dto.getRoomID());
         maintenance.setType(type);
-        maintenance.setStatus(1);
+        maintenance.setStatus(2);
         maintenance= maintenanceRepository.save(maintenance);
 
         createApprovaStepCreated(maintenance, dto.getIdCreator(), dto.getImageFile().getBytes());
@@ -45,6 +45,8 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         if(type == 0) {//0: user, 1: admin
             createApproval(maintenance, 1, 1, null);
         }
+
+
 
         return maintenance;
     }
