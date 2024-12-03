@@ -42,6 +42,11 @@ public class MaintenanceController {
         }
     }
 
+    @GetMapping("/mymaintenance")
+    public ResponseEntity<List<Maintenance>> getMaintenanceByIDUser(@RequestParam Long userid) throws Exception{
+        return ResponseEntity.ok(maintenanceServiceImplementation.getMyMaintenance(userid));
+    }
+
     @GetMapping("/getByStatus")
     public ResponseEntity<List<Maintenance>> getByStatus(@RequestParam Integer status, @RequestParam Integer page)throws Exception{
 

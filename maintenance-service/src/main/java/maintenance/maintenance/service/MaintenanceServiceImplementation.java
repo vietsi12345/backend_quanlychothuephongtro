@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -319,6 +320,17 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         }
     }
 
+    @Override
+    public List<Maintenance> getMyMaintenance(Long creator) throws Exception {
+        List<Approval> approvals = approvalService.getStep0ByCreator(creator);
+        List<Maintenance> result = new ArrayList<>();
+        for(Approval a : approvals){
+            result.add(getMaintenanceById(a.getMaintenance().getID()));
+        }
+
+        return result;
+    }
+
 
     @Override
     public List<Maintenance> getAllMaintenance() throws Exception {
@@ -418,5 +430,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
     public List<Maintenance> getMaintenanceByHandler(Long userID) throws Exception {
         return null;
     }
+
+
 
 }

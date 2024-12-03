@@ -26,4 +26,8 @@ public interface ApprovalRepository extends JpaRepository<Approval, Long> {
 
     @Query("SELECT a FROM Approval a WHERE a.maintenance.id = :maintenanceId AND a.step = 0 AND a.round = :round")
     Approval getApprovalStep0(@Param("maintenanceId") Long maintenanceId, @Param("round") Integer round);
+
+
+    @Query("SELECT a FROM Approval a WHERE a.handlerID = :handlerID AND a.step = 0 AND a.round = 1")
+    List<Approval> getStep0ByCreator(@Param("handlerID") Long handlerID);
 }

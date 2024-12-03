@@ -107,4 +107,8 @@ public class ApprovalServiceImplementation implements ApprovalService {
             approvalRepository.delete(app);
         }
     }
+
+    public List<Approval> getStep0ByCreator(Long handler) throws Exception{
+        return approvalRepository.getStep0ByCreator(handler);
+    }
 }

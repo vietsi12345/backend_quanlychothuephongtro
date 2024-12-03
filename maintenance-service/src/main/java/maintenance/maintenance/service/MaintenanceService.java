@@ -49,4 +49,6 @@ public interface MaintenanceService {
     String deletMaintenance(Long id) throws Exception;
 
     Maintenance updateMaintenance(MaintenanceDTO maintenanceDTO, Long id) throws Exception;
+
+    List<Maintenance> getMyMaintenance(Long creator) throws  Exception;
 }
