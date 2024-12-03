@@ -13,7 +13,7 @@ import java.util.List;
 @Repository
 public interface ApprovalRepository extends JpaRepository<Approval, Long> {
     List<Approval> findByHandlerID(Long handlerID);
-    List<Approval> findByMaintenance(Maintenance maintenance);
+    List<Approval> findByMaintenance(Maintenance maintenance); //
 
     @Query("SELECT MAX(a.round) FROM Approval a WHERE a.maintenance.id = :maintenanceId")
     Integer findMaxRoundByMaintenanceId(@Param("maintenanceId") Long maintenanceId);
