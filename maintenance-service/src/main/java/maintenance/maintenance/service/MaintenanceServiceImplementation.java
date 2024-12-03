@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -101,23 +102,25 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
                         break;
                 }
             } else if (currentStep == 3) {//0: decline, 1: in process 2: approval, 3: RQUD
-                switch (dto.getStatus()) {
-                    //0: cancel, 1 in process, 2: Declined, 3: Request Update , 4: completed
-                    case 2:
-                        maintenance.setStatus(4);
-                        break;
-                    case 3:
-                        maintenance.setStatus(3);
-                        //createApproval(maintenance, 1, currentRound + 1, null);
-                        break;
+                if(Objects.equals(getCreator(maintenance.getID()), dto.getUserID())) {
+                    switch (dto.getStatus()) {
+                        //0: cancel, 1 in process, 2: Declined, 3: Request Update , 4: completed
+                        case 2:
+                            maintenance.setStatus(4);
+                            break;
+                        case 3:
+                            maintenance.setStatus(3);
+                            //createApproval(maintenance, 1, currentRound + 1, null);
+                            break;
+                    }
                 }
             }
 
             approvalService.save(approval);
 
 
-            return maintenanceRepository.save(maintenance);
-//            return getMaintenanceRespnoseById(maintenance.getID());
+             maintenanceRepository.save(maintenance);
+            return getMaintenanceById(maintenance.getID());
         }
         catch (NullPointerException nullPointerException){
             System.err.println(nullPointerException.getMessage());
