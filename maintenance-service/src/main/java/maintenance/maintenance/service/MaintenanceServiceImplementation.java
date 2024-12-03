@@ -24,6 +24,31 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
 //    @Autowired
 //    private BookingServiceImplementation bookingServiceImplementation;
 
+    public Maintenance updateMaintenanceAdmin(ApprovalDTO dto) throws Exception{
+        Maintenance maintenance = getMaintenanceById(dto.getIdMaintence());
+
+        if(maintenance.getType() == 1 && maintenance.getStatus()==1) {
+
+            maintenance.setTotalMoney(dto.getTotalMoney());
+            maintenance.setStatus(2);
+
+            Approval approval = approvalService.findCurrentApprovalMaintenance(dto.getIdMaintence());
+            approval.setHandlerID(dto.getUserID());
+            approval.setReview("Bảo trif xong");
+            approval.setStatus(2);
+            approval.setApprovalAt(LocalDateTime.now());
+            approval.setImageEnd(dto.getImageFile().getBytes());
+
+            maintenanceRepository.save(maintenance);
+
+            approvalService.save(approval);
+
+            return getMaintenanceById(maintenance.getID());
+        }else{
+            throw new InvalidMaintenanceStatusException("Wrong status");
+        }
+    }
+
     @Override
     public Maintenance convertDTOToModelCreated(MaintenanceDTO dto, Integer type) throws Exception{
         Maintenance maintenance = new Maintenance();
@@ -37,13 +62,19 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         //maintenance.setImageBefore(dto.getImageFile().getBytes());
         maintenance.setRoomID(dto.getRoomID());
         maintenance.setType(type);
-        maintenance.setStatus(2);
+        maintenance.setStatus(1);
         maintenance= maintenanceRepository.save(maintenance);
 
         createApprovaStepCreated(maintenance, dto.getIdCreator(), dto.getImageFile().getBytes());
 
         if(type == 0) {//0: user, 1: admin
             createApproval(maintenance, 1, 1, null);
+        }else{
+            createApproval(maintenance, 1, 1, null);
+            // bao tri phong o day
+
+
+            // maintenance.setStatus(2);
         }
 
 
@@ -189,7 +220,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         approval.setReview("Created");
         approval.setHandlerID(idCreator);
         approval.setMaintenance(maintenance);
-        approval.setStatus(1);
+        approval.setStatus(2);
         approval.setImageEnd(image);
 
         approvalService.save(approval);

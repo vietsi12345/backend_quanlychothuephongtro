@@ -31,6 +31,16 @@ public class MaintenanceAdminController {
         return ResponseEntity.ok(maintenanceServiceImplementation.createMaintenanceUser(maintenanceDTO,1));
     }
 
+    @PutMapping("/approvaladmin")
+    public ResponseEntity<Maintenance> approvalMaintenanceAdmin(@ModelAttribute ApprovalDTO approvalDTO) throws Exception{
+        try {
+            return ResponseEntity.ok(maintenanceServiceImplementation.updateMaintenanceAdmin(approvalDTO));
+        }
+        catch (InvalidMaintenanceStatusException invalidMaintenanceStatusException){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
     @GetMapping("/getByRoom/{id}")
     public ResponseEntity<List<Maintenance>> getByContract(@PathVariable Long id)throws Exception{
         return ResponseEntity.ok(maintenanceServiceImplementation.getMaintenanceByContract(id));

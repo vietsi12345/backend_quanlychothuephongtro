@@ -75,11 +75,12 @@ public class ApprovalServiceImplementation implements ApprovalService {
         if(maintenanceRepository.findById(maintenanceID).isPresent()){
             Maintenance maintenance = maintenanceRepository.findById(maintenanceID).get();
             List<Approval> approvals = findByMaintenance(maintenance);
-            for(Approval app : approvals){
-                if(Objects.equals(app.getStep(), findStep(maintenance.getID()))){
-                    return app;
-                }
-            }
+            return approvals.get(approvals.size() - 1);
+//            for(Approval app : approvals){
+//                if(Objects.equals(app.getStep(), findStep(maintenance.getID()))){
+//                    return app;
+//                }
+//            }
         }
 
         return null;
