@@ -64,21 +64,20 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         maintenance.setType(type);
         maintenance.setStatus(1);
         maintenance= maintenanceRepository.save(maintenance);
+        List<Approval> approvals = new ArrayList<>();
 
-        createApprovaStepCreated(maintenance, dto.getIdCreator(), dto.getImageFile().getBytes());
+        approvals.add(createApprovaStepCreated(maintenance, dto.getIdCreator(), dto.getImageFile().getBytes()));
 
         if(type == 0) {//0: user, 1: admin
-            createApproval(maintenance, 1, 1, null);
+            approvals.add(createApproval(maintenance, 1, 1, null));
         }else{
-            createApproval(maintenance, 1, 1, null);
+            approvals.add(createApproval(maintenance, 1, 1, null));
             // bao tri phong o day
 
 
             // maintenance.setStatus(2);
         }
-
-
-
+        maintenance.setApprovals(approvals);
         return maintenance;
     }
 
@@ -94,67 +93,72 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
             if (maintenance.getStatus() != 1){
                 throw new InvalidMaintenanceStatusException ("Invalid status");
             }
+            if(maintenance.getType() == 0) {
 
-            Approval approval = approvalService.findCurrentApprovalMaintenance(dto.getIdMaintence());
-            approval.setHandlerID(dto.getUserID());
-            approval.setReview(dto.getReview());
-            approval.setStatus(dto.getStatus());
-            approval.setApprovalAt(LocalDateTime.now());
+                Approval approval = approvalService.findCurrentApprovalMaintenance(dto.getIdMaintence());
+                approval.setHandlerID(dto.getUserID());
+                approval.setReview(dto.getReview());
+                approval.setStatus(dto.getStatus());
+                approval.setApprovalAt(LocalDateTime.now());
 
 
-            Integer currentStep = getStep(maintenance.getID());
-            Integer currentRound = getRound(maintenance.getID());
+                Integer currentStep = getStep(maintenance.getID());
+                Integer currentRound = getRound(maintenance.getID());
 
-            if (currentStep == 1) {
-                switch (dto.getStatus()) {//0: decline, 1: in process 2: approval, 3: RQUD
-                    case 0:
-                        maintenance.setStatus(4);
-                        //0: cancel, 1 in process, 2: Declined, 3: Request Update , 4: completed
-                        break;
-                    case 2:
-                        createApproval(maintenance, 2, currentRound,null);
-                        break;
-                    case 3:
-                        maintenance.setStatus(3);
-                        break;
+                if (currentStep == 1) {
+                    switch (dto.getStatus()) {//0: decline, 1: in process 2: approval, 3: RQUD
+                        case 0:
+                            maintenance.setStatus(4);
+                            //0: cancel, 1 in process, 2: Declined, 3: Request Update , 4: completed
+                            break;
+                        case 2:
+                            createApproval(maintenance, 2, currentRound, null);
+                            break;
+                        case 3:
+                            maintenance.setStatus(3);
+                            break;
 
-                }
-            } else if (currentStep == 2) {
-                switch (dto.getStatus()) {///0: decline, 1: in process 2: approval, 3: RQUD
+                    }
+                } else if (currentStep == 2) {
+                    switch (dto.getStatus()) {///0: decline, 1: in process 2: approval, 3: RQUD
                 /*case 0:
                     maintenance.setStatus(2);
                     //0: cancel, 1 in process, 2: Declined, 3: Request Update , 4: completed
                     break;*/
-                    case 2:
-                        maintenance.setTotalMoney(dto.getTotalMoney());
-                        approval.setImageEnd(dto.getImageFile().getBytes());
-
-                        createApproval(maintenance, 3, currentRound, getCreator(maintenance.getID()));
-                        break;
-                    case 3:
-                        maintenance.setStatus(3);
-                        break;
-                }
-            } else if (currentStep == 3) {//0: decline, 1: in process 2: approval, 3: RQUD
-                if(Objects.equals(getCreator(maintenance.getID()), dto.getUserID())) {
-                    switch (dto.getStatus()) {
-                        //0: cancel, 1 in process, 2: Declined, 3: Request Update , 4: completed
                         case 2:
-                            maintenance.setStatus(4);
+                            maintenance.setTotalMoney(dto.getTotalMoney());
+                            approval.setImageEnd(dto.getImageFile().getBytes());
+
+                            createApproval(maintenance, 3, currentRound, getCreator(maintenance.getID()));
                             break;
                         case 3:
                             maintenance.setStatus(3);
-                            //createApproval(maintenance, 1, currentRound + 1, null);
                             break;
                     }
+                } else if (currentStep == 3) {//0: decline, 1: in process 2: approval, 3: RQUD
+                    if (Objects.equals(getCreator(maintenance.getID()), dto.getUserID())) {
+                        switch (dto.getStatus()) {
+                            //0: cancel, 1 in process, 2: Declined, 3: Request Update , 4: completed
+                            case 2:
+                                maintenance.setStatus(4);
+                                break;
+                            case 3:
+                                maintenance.setStatus(3);
+                                //createApproval(maintenance, 1, currentRound + 1, null);
+                                break;
+                        }
+                    }
                 }
+
+                approvalService.save(approval);
+
+
+                maintenanceRepository.save(maintenance);
+
+                return maintenance;
+            }else{
+                return updateMaintenanceAdmin(dto);
             }
-
-            approvalService.save(approval);
-
-
-             maintenanceRepository.save(maintenance);
-            return getMaintenanceById(maintenance.getID());
         }
         catch (NullPointerException nullPointerException){
             System.err.println(nullPointerException.getMessage());
@@ -201,7 +205,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
 //        }
 //    }
 
-    public void createApproval(Maintenance maintenance, Integer step, Integer round, Long handlerID) throws Exception{
+    public Approval createApproval(Maintenance maintenance, Integer step, Integer round, Long handlerID) throws Exception{
         Approval approval = new Approval();
         approval.setStep(step);
         approval.setMaintenance(maintenance);
@@ -209,10 +213,10 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         approval.setRound(round);
         approval.setHandlerID(handlerID);
 
-        approvalService.save(approval);
+        return approvalService.save(approval);
     }
 
-    public void createApprovaStepCreated(Maintenance maintenance, Long idCreator, byte[] image) throws Exception{
+    public Approval createApprovaStepCreated(Maintenance maintenance, Long idCreator, byte[] image) throws Exception{
         Approval approval = new Approval();
         approval.setRound(1);
         approval.setStep(0);
@@ -223,7 +227,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
         approval.setStatus(2);
         approval.setImageEnd(image);
 
-        approvalService.save(approval);
+        return approvalService.save(approval);
     }
 
 
