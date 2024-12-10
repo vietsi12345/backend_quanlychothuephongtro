@@ -40,7 +40,7 @@ public interface MaintenanceService {
 
     Maintenance ApprovalMaintenance(ApprovalDTO dto) throws Exception;
 
-    Maintenance cancelMaintenance(Long id) throws  Exception;
+    Maintenance cancelMaintenance(Long idMantenance, Long idCancel) throws  Exception;
 
     //Maintenance updateMaintenance(Long id, MaintenanceDTO maintenanceDTO) throws Exception;
 

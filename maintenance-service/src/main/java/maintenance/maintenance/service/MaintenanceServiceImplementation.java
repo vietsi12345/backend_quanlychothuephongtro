@@ -1,6 +1,7 @@
 package maintenance.maintenance.service;
 
 import maintenance.maintenance.exeption.InvalidMaintenanceStatusException;
+import maintenance.maintenance.exeption.InvalidPermission;
 import maintenance.maintenance.model.*;
 import maintenance.maintenance.repository.MaintenanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +36,10 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
             Approval approval = approvalService.findCurrentApprovalMaintenance(dto.getIdMaintence());
             approval.setHandlerID(dto.getUserID());
             approval.setReview("Bảo trif xong");
-            approval.setStatus(2);
+            approval.setStatus(4);
             approval.setApprovalAt(LocalDateTime.now());
             approval.setImageEnd(dto.getImageFile().getBytes());
+
 
             maintenanceRepository.save(maintenance);
 
@@ -167,7 +169,7 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
     }
 
     @Override
-    public Maintenance cancelMaintenance(Long id) throws Exception {
+    public Maintenance cancelMaintenance(Long id, Long idCancel) throws Exception {
         try{
             Maintenance maintenance = getMaintenanceById(id);
             if(getStep(maintenance.getID()) != 1){
@@ -175,6 +177,13 @@ public class MaintenanceServiceImplementation implements MaintenanceService{
                         "Cannot cancel maintenance request. Current step is invalid for resubmission."
                 );
             }
+
+            if(!Objects.equals(getCreator(maintenance.getID()), idCancel)){
+                throw new InvalidPermission(
+                        "Cannot cancel maintenance request. You don't have permission."
+                );
+            }
+
             maintenance.setStatus(0);
 
             return maintenanceRepository.save(maintenance);

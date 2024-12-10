@@ -2,6 +2,7 @@ package maintenance.maintenance.controller;
 
 
 import maintenance.maintenance.exeption.InvalidMaintenanceStatusException;
+import maintenance.maintenance.exeption.InvalidPermission;
 import maintenance.maintenance.model.ApprovalDTO;
 import maintenance.maintenance.model.Maintenance;
 import maintenance.maintenance.model.MaintenanceDTO;
@@ -29,15 +30,15 @@ public class MaintenanceController {
         return ResponseEntity.ok(maintenanceServiceImplementation.getMaintenanceById(id));
     }
 
-    @PutMapping("/cancel/{id}")
-    public ResponseEntity<Maintenance> cancelMaintenance(@PathVariable Long id) throws Exception{
+    @PutMapping("/cancel")
+    public ResponseEntity<Maintenance> cancelMaintenance(@RequestParam Long idMaintenance, @RequestParam Long idCancel) throws Exception{
         try {
-            return ResponseEntity.ok(maintenanceServiceImplementation.cancelMaintenance(id));
+            return ResponseEntity.ok(maintenanceServiceImplementation.cancelMaintenance(idMaintenance, idCancel));
         }
         catch (NullPointerException nullPointerException){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        catch (InvalidMaintenanceStatusException invalidMaintenanceStatusException){
+        catch (InvalidMaintenanceStatusException | InvalidPermission invalidMaintenanceStatusException){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
