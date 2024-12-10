@@ -29,7 +29,7 @@ public class MaintenanceController {
         return ResponseEntity.ok(maintenanceServiceImplementation.getMaintenanceById(id));
     }
 
-    @GetMapping("/cancel/{id}")
+    @PutMapping("/cancel/{id}")
     public ResponseEntity<Maintenance> cancelMaintenance(@PathVariable Long id) throws Exception{
         try {
             return ResponseEntity.ok(maintenanceServiceImplementation.cancelMaintenance(id));
